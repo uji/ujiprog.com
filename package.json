@@ -1,0 +1,22 @@
+{
+  "name": "ujiprog.com",
+  "type": "module",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "astro": "^5.16.8"
+  },
+  "description": "ujiprog.com - ブログサイト",
+  "homepage": "https://ujiprog.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/uji/ujiprog.com.git"
+  },
+  "author": "uji",
+  "license": "MIT"
+}
