@@ -5,8 +5,8 @@
 	"scripts": {
 		"build": "go run github.com/syumai/workers/cmd/workers-assets-gen -mode=go && GOOS=js GOARCH=wasm go build -o ./build/app.wasm .",
 		"deploy": "wrangler deploy",
-		"dev": "wrangler dev",
-		"start": "wrangler dev"
+		"dev": "wrangler dev --remote",
+		"start": "wrangler dev --remote"
 	},
 	"devDependencies": {
 		"wrangler": "^4.58.0"
