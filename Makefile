@@ -5,7 +5,7 @@ run:
 .PHONY: fetch-zenn
 fetch-zenn:
 	@curl -s "https://zenn.dev/api/articles?username=uji" | \
-	jq '{zenn: [.articles[] | {title: .title, url: "https://zenn.dev/uji/articles/\(.slug)"}]}' > public/articles.json
+	jq '{zenn: [.articles[] | {title: .title, url: "https://zenn.dev/uji/articles/\(.slug)", published_at: .published_at}]}' > public/articles.json
 	@echo "Updated public/articles.json"
 
 .PHONY: deploy

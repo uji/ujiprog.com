@@ -221,6 +221,17 @@
         flex: 1;
       }
 
+      .article-card .article-title {
+        display: block;
+      }
+
+      .article-card .article-date {
+        display: block;
+        font-size: 0.75rem;
+        opacity: 0.6;
+        margin-top: 0.25rem;
+      }
+
       /* Responsive */
       @media (max-width: 768px) {
         .articles-grid {
@@ -298,7 +309,8 @@
             const a = document.createElement('a');
             a.href = article.url;
             a.className = 'article-card';
-            a.innerHTML = zennIcon + '<span>' + article.title.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
+            const date = new Date(article.published_at).toLocaleDateString('ja-JP');
+            a.innerHTML = zennIcon + '<span><span class="article-title">' + article.title.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span><span class="article-date">' + date + '</span></span>';
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
             container.appendChild(a);
