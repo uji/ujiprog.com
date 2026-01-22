@@ -16,8 +16,9 @@ go run .           # Wrangler なしで開発サーバーを起動 (Cloudflare �
 
 ### ビルドとデプロイ
 ```bash
-npm run build      # Workers デプロイ用の Go Wasm バイナリをビルド
-npm run deploy     # Cloudflare Workers にデプロイ
+npm run build                                      # Workers デプロイ用の Go Wasm バイナリをビルド
+npm run deploy                                     # Cloudflare Workers にデプロイ
+GOOS=js GOARCH=wasm go build -o ./build/app.wasm . # Go コードのビルドが通ることを確認する
 ```
 
 ## コードスタイルガイドライン

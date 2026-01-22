@@ -29,6 +29,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		io.Copy(w, obj.Body)
 	})
+	http.HandleFunc("/feed.xml", feedHandler)
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
 		bucket, err := r2.NewBucket("STATIC_BUCKET")
 		if err != nil {
