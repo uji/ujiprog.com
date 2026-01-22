@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(make run)",
+      "Bash(make fetch-zenn)",
+      "Bash(curl -s http://localhost*)",
+      "Bash(open http://localhost:*)"
+    ]
+  }
+}
