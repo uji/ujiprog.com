@@ -241,6 +241,7 @@
         text-decoration: none;
         font-size: 0.9rem;
         transition: all 0.3s ease;
+        height: 100%;
       }
 
       .article-card:hover {
@@ -252,20 +253,19 @@
         flex-shrink: 0;
       }
 
-      .article-card span {
+      .article-card .article-title {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
         width: 100%;
       }
 
-      .article-card .article-title {
-        display: block;
-      }
-
       .article-card .article-date {
-        display: block;
         font-size: 0.75rem;
         opacity: 0.6;
-        margin-top: 0.25rem;
+        margin-top: auto;
       }
 
       /* Responsive */
@@ -368,7 +368,7 @@
             a.className = 'article-card';
             const date = new Date(article.published_at).toLocaleDateString('ja-JP');
             const icon = icons[article.platform] || icons.zenn;
-            a.innerHTML = icon + '<span><span class="article-title">' + article.title.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span><span class="article-date">' + date + '</span></span>';
+            a.innerHTML = icon + '<span class="article-title">' + article.title.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span><span class="article-date">' + date + '</span>';
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
             container.appendChild(a);
