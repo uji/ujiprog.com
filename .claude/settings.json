@@ -4,7 +4,11 @@
       "Bash(make run)",
       "Bash(make fetch-zenn)",
       "Bash(curl -s http://localhost*)",
-      "Bash(open http://localhost:*)"
+      "Bash(open http://localhost:*)",
+      "Skill(verify-browser)"
     ]
+  },
+  "enabledPlugins": {
+    "agent-browser@agent-browser": true
   }
 }
