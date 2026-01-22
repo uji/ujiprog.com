@@ -4,12 +4,17 @@ run:
 
 .PHONY: fetch-articles
 fetch-articles:
-	@echo "Fetching articles from Zenn and note..."
+	@echo "Fetching articles from Zenn, note, and SpeakerDeck..."
 	@( \
 		curl -s "https://zenn.dev/api/articles?username=uji" | \
 		jq '[.articles[] | {title: .title, url: "https://zenn.dev/uji/articles/\(.slug)", published_at: .published_at, platform: "zenn"}]'; \
 		curl -s "https://note.com/api/v2/creators/ujiii/contents?kind=note&page=1" | \
-		jq '[.data.contents[] | {title: .name, url: .noteUrl, published_at: .publishAt, platform: "note"}]' \
+		jq '[.data.contents[] | {title: .name, url: .noteUrl, published_at: .publishAt, platform: "note"}]'; \
+		python3 -c 'import json,urllib.request,xml.etree.ElementTree as ET; \
+		r=urllib.request.urlopen("https://speakerdeck.com/uji.atom"); \
+		root=ET.fromstring(r.read().decode("utf-8")); \
+		ns={"a":"http://www.w3.org/2005/Atom"}; \
+		print(json.dumps([{"title":e.find("a:title",ns).text,"url":e.find("a:link[@rel=\"alternate\"]",ns).get("href"),"published_at":e.find("a:published",ns).text,"platform":"speakerdeck"} for e in root.findall("a:entry",ns)],ensure_ascii=False))' \
 	) | jq -s 'add | sort_by(.published_at) | reverse | {articles: .}' > public/articles.json
 	@echo "Updated public/articles.json"
 

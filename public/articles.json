@@ -13,10 +13,22 @@
       "platform": "zenn"
     },
     {
+      "title": "testdata ディレクトリを活用しよう！",
+      "url": "https://speakerdeck.com/uji/testdata-deirekutoriwohuo-yong-siyou",
+      "published_at": "2025-12-01T23:52:16-05:00",
+      "platform": "speakerdeck"
+    },
+    {
       "title": "NOT A HOTEL DAO THE DOOR 開発秘話",
       "url": "https://note.com/ujiii/n/nb01e251b9d13",
       "published_at": "2025-11-17T21:19:40+09:00",
       "platform": "note"
+    },
+    {
+      "title": "MCP 公式の Go SDK で QA データ登録アシスタントを作ってみた",
+      "url": "https://speakerdeck.com/uji/mcp-gong-shi-no-go-sdk-de-qa-detadeng-lu-asisutantowozuo-tutemita",
+      "published_at": "2025-10-24T04:51:45-04:00",
+      "platform": "speakerdeck"
     },
     {
       "title": "TinyGoはどのように \"Tiny\" を実現している？",
@@ -37,10 +49,28 @@
       "platform": "zenn"
     },
     {
+      "title": "Green Tea GCの動作を紙芝居にしてみる",
+      "url": "https://speakerdeck.com/uji/green-tea-gcnodong-zuo-wozhi-zhi-ju-nisitemiru",
+      "published_at": "2025-09-04T10:42:48-04:00",
+      "platform": "speakerdeck"
+    },
+    {
+      "title": "Go Proverbs の紹介",
+      "url": "https://speakerdeck.com/uji/go-proverbs-noshao-jie",
+      "published_at": "2025-07-26T23:31:20-04:00",
+      "platform": "speakerdeck"
+    },
+    {
       "title": "GoのModel Context Protocol (MCP)の開発フレームワークmcp-goを使ってみる",
       "url": "https://zenn.dev/uji/articles/try-mpc-development-mcp-go",
       "published_at": "2025-03-21T21:47:25.228+09:00",
       "platform": "zenn"
+    },
+    {
+      "title": "Go標準の暗号ライブラリメンテナンス戦略",
+      "url": "https://speakerdeck.com/uji/gobiao-zhun-noan-hao-raihurari-mentenansuzhan-lue",
+      "published_at": "2025-01-17T19:48:45-05:00",
+      "platform": "speakerdeck"
     },
     {
       "title": "Goのポスト量子暗号（耐量子計算機暗号）サポート方針",
@@ -67,6 +97,12 @@
       "platform": "zenn"
     },
     {
+      "title": "NOT A HOTEL TECH TALK ーSOFTWARE 3.0への道筋ー NEXT Web3 (2024-08-07)",
+      "url": "https://speakerdeck.com/uji/not-a-hotel-tech-talk-software-3-dot-0henodao-jin-next-web3-2024-08-07",
+      "published_at": "2024-08-07T21:53:25-04:00",
+      "platform": "speakerdeck"
+    },
+    {
       "title": "GoのOSS(Code-Hex/Synchro)にファジングテストを実装して得た学び",
       "url": "https://zenn.dev/uji/articles/fuzzing-synchro",
       "published_at": "2024-05-02T12:31:09.625+09:00",
@@ -83,6 +119,18 @@
       "url": "https://zenn.dev/uji/articles/avalanche-warp-messaging",
       "published_at": "2023-07-03T20:00:00.834+09:00",
       "platform": "zenn"
+    },
+    {
+      "title": "マネーフォワード ME ブロックチェーン連携機能におけるGoの活用方法",
+      "url": "https://speakerdeck.com/uji/manehuowato-me-hurotukutienlian-xi-ji-neng-niokerugonohuo-yong-fang-fa",
+      "published_at": "2023-06-15T04:57:29-04:00",
+      "platform": "speakerdeck"
+    },
+    {
+      "title": "Goはブロックチェーン領域でなぜ使われ、どのように活躍しているのか",
+      "url": "https://speakerdeck.com/uji/gohahurotukutienling-yu-tenaseshi-ware-tonoyounihuo-yue-siteirunoka",
+      "published_at": "2023-06-02T03:25:40-04:00",
+      "platform": "speakerdeck"
     },
     {
       "title": "go-ethereumの暗号ライブラリ活用戦略",
@@ -109,10 +157,46 @@
       "platform": "zenn"
     },
     {
+      "title": "標準パッケージ初のgenerics利用事例 \"sync/atomic.Pointer\"",
+      "url": "https://speakerdeck.com/uji/atomic-dot-pointer",
+      "published_at": "2022-10-14T11:41:31-04:00",
+      "platform": "speakerdeck"
+    },
+    {
+      "title": "5分で完全理解するGoのiota",
+      "url": "https://speakerdeck.com/uji/5fen-dewan-quan-li-jie-surugofalseiota",
+      "published_at": "2022-05-13T08:07:02-04:00",
+      "platform": "speakerdeck"
+    },
+    {
+      "title": "GoのGC (garbage collector)について理解する",
+      "url": "https://speakerdeck.com/uji/gofalsegc-garbage-collector-nituiteli-jie-suru",
+      "published_at": "2022-04-22T23:33:32-04:00",
+      "platform": "speakerdeck"
+    },
+    {
       "title": "gotipでリリース前のGoを使って最先端Gopherになる",
       "url": "https://zenn.dev/uji/articles/d51e81535e0d723af56e",
       "published_at": "2021-12-14T23:59:26.614+09:00",
       "platform": "zenn"
+    },
+    {
+      "title": "シンプルなモック生成ツール matryer/moq 使ってみた",
+      "url": "https://speakerdeck.com/uji/moq-shi-tutemita",
+      "published_at": "2021-05-30T11:41:35-04:00",
+      "platform": "speakerdeck"
+    },
+    {
+      "title": "goroutine で panic すると親プロセスをまきこんで落ちる",
+      "url": "https://speakerdeck.com/uji/goroutine-de-panic-surutoqin-purosesuwomakikondeluo-tiru",
+      "published_at": "2021-02-20T21:37:03-05:00",
+      "platform": "speakerdeck"
+    },
+    {
+      "title": "Goにおけるポインタの使いどころ",
+      "url": "https://speakerdeck.com/uji/goniokerupointafalseshi-idokoro",
+      "published_at": "2021-01-15T13:02:49-05:00",
+      "platform": "speakerdeck"
     },
     {
       "title": "Goにおけるポインタの使いどころ",
@@ -125,6 +209,12 @@
       "url": "https://zenn.dev/uji/articles/112da02adc7ff3",
       "published_at": "2020-12-06T00:01:09.118+09:00",
       "platform": "zenn"
+    },
+    {
+      "title": "Google Chromeで始めるVim",
+      "url": "https://speakerdeck.com/uji/google-chromedeshi-meruvim",
+      "published_at": "2020-02-09T10:50:45-05:00",
+      "platform": "speakerdeck"
     }
   ]
 }
