@@ -1,0 +1,80 @@
+{
+  "zenn": [
+    {
+      "title": "TinyGoはどのように \"Tiny\" を実現している？",
+      "url": "https://zenn.dev/uji/articles/how-tinygo-tiny"
+    },
+    {
+      "title": "Go 1.24 から go.mod でのツール管理がより簡潔になるかもしれない",
+      "url": "https://zenn.dev/uji/articles/adding-tool-dependencies-to-go-mod"
+    },
+    {
+      "title": "GoのModel Context Protocol (MCP)の開発フレームワークmcp-goを使ってみる",
+      "url": "https://zenn.dev/uji/articles/try-mpc-development-mcp-go"
+    },
+    {
+      "title": "Goにおけるポインタの使いどころ",
+      "url": "https://zenn.dev/uji/articles/f6ab9a06320294146733"
+    },
+    {
+      "title": "Go の test における flag パッケージ活用Tips",
+      "url": "https://zenn.dev/uji/articles/go-flag-usecase-in-test"
+    },
+    {
+      "title": "GoのOSS(Code-Hex/Synchro)にファジングテストを実装して得た学び",
+      "url": "https://zenn.dev/uji/articles/fuzzing-synchro"
+    },
+    {
+      "title": "Lit Protocolの技術的概要と価値",
+      "url": "https://zenn.dev/uji/articles/8c666a192b88bd"
+    },
+    {
+      "title": "Dockerを使ったコンテナ環境での開発にVimで立ち向かう",
+      "url": "https://zenn.dev/uji/articles/112da02adc7ff3"
+    },
+    {
+      "title": "Go1.20でサポート予定の統合テスト用カバレッジプロファイリングを触る",
+      "url": "https://zenn.dev/uji/articles/25469f8d60621b"
+    },
+    {
+      "title": "Goのポスト量子暗号（耐量子計算機暗号）サポート方針",
+      "url": "https://zenn.dev/uji/articles/go-crypto-post-quantum-support"
+    },
+    {
+      "title": "Go1.19~のsync/atomicの新旧APIの使い分け",
+      "url": "https://zenn.dev/uji/articles/168f81da564eec9d800f"
+    },
+    {
+      "title": "Goの別パッケージのテストはデフォルトではt.Parallel()の有無に限らず並列実行される",
+      "url": "https://zenn.dev/uji/articles/go-test-parallel-package"
+    },
+    {
+      "title": "gotipでリリース前のGoを使って最先端Gopherになる",
+      "url": "https://zenn.dev/uji/articles/d51e81535e0d723af56e"
+    },
+    {
+      "title": "Go Conference 2025 参加レポート",
+      "url": "https://zenn.dev/uji/articles/go-conference-2025-report"
+    },
+    {
+      "title": "Wio Terminal+TinyGoでネームバッジを作ってみる",
+      "url": "https://zenn.dev/uji/articles/wio-terminal-tinygo"
+    },
+    {
+      "title": "go-ethereumの暗号ライブラリ活用戦略",
+      "url": "https://zenn.dev/uji/articles/2ea4ed4a4117f4"
+    },
+    {
+      "title": "AvalancheのSubnet間の通信プロトコル Avalanche Warp Messaging(AWM) の仕組み",
+      "url": "https://zenn.dev/uji/articles/avalanche-warp-messaging"
+    },
+    {
+      "title": "Go Workshop Conference 2025 IN KOBE 参加レポート",
+      "url": "https://zenn.dev/uji/articles/go-workshop-conference-2025"
+    },
+    {
+      "title": "ERC-6900: Modular account abstraction が解決する Account Abstraction の課題",
+      "url": "https://zenn.dev/uji/articles/erc-6900-modular-account-abstraction"
+    }
+  ]
+}

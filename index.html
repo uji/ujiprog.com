@@ -167,7 +167,67 @@
         opacity: 1;
       }
 
+      /* Articles section */
+      .articles-section {
+        width: 100%;
+        max-width: 900px;
+        padding: 2rem;
+        animation: fadeInUp 1s ease-out 0.7s both;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        color: #4A4B4A;
+      }
+
+      .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+
+      .articles-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+      }
+
+      .article-card {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        padding: 1rem;
+        border-radius: 0.75rem;
+        background: rgba(255, 255, 255, 0.3);
+        color: #4A4B4A;
+        text-decoration: none;
+        font-size: 0.9rem;
+        transition: all 0.3s ease;
+      }
+
+      .article-card:hover {
+        background: #FDF4CD;
+        transform: translateY(-2px);
+      }
+
+      .article-card svg {
+        flex-shrink: 0;
+        margin-top: 0.15rem;
+      }
+
+      .article-card span {
+        flex: 1;
+      }
+
       /* Responsive */
+      @media (max-width: 768px) {
+        .articles-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
       @media (max-width: 480px) {
         main {
           padding: 3rem 1.5rem;
@@ -185,6 +245,10 @@
 
         .link {
           font-size: 0.9rem;
+        }
+
+        .articles-grid {
+          grid-template-columns: 1fr;
         }
       }
     </style>
@@ -208,6 +272,13 @@
           x.com/uji_rb
         </a>
       </nav>
+
+      <section class="articles-section">
+        <div class="section-header">
+          <h2 class="section-title">Articles</h2>
+        </div>
+        <div id="zenn-articles" class="articles-grid"></div>
+      </section>
     </main>
 
     <footer>
@@ -215,5 +286,24 @@
         github.com/uji/ujiprog.com
       </a>
     </footer>
+
+    <script>
+      const zennIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M.264 23.771h4.984c.264 0 .498-.147.645-.352L19.614.874c.176-.293-.029-.645-.381-.645h-4.72c-.235 0-.44.117-.557.323L.03 23.126c-.088.176.029.645.234.645zM17.445 23.419l6.479-10.408c.205-.323-.029-.733-.41-.733h-4.691c-.176 0-.352.088-.44.235l-6.655 10.643c-.176.264.029.616.352.616h4.926c.176 0 .352-.088.44-.353z" fill="#3EA8FF"/></svg>';
+
+      fetch('/articles.json')
+        .then(res => res.json())
+        .then(data => {
+          const container = document.getElementById('zenn-articles');
+          data.zenn.forEach(article => {
+            const a = document.createElement('a');
+            a.href = article.url;
+            a.className = 'article-card';
+            a.innerHTML = zennIcon + '<span>' + article.title.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span>';
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            container.appendChild(a);
+          });
+        });
+    </script>
   </body>
 </html>
