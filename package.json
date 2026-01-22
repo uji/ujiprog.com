@@ -5,7 +5,8 @@
 	"scripts": {
 		"build": "go run github.com/syumai/workers/cmd/workers-assets-gen -mode=go && GOOS=js GOARCH=wasm go build -o ./build/app.wasm .",
 		"deploy": "wrangler deploy",
-		"dev": "wrangler dev --remote",
+		"dev": "npm run dev:assets && wrangler dev",
+		"dev:assets": "wrangler r2 object put ujiprog-static/index.html --file=index.html --local && wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --local && wrangler r2 object put ujiprog-static/favicon.ico --file=public/favicon.ico --local",
 		"start": "wrangler dev --remote"
 	},
 	"devDependencies": {
