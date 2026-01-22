@@ -2,10 +2,15 @@
 run:
 	go tool air
 
-.PHONY: fetch-zenn
-fetch-zenn:
-	@curl -s "https://zenn.dev/api/articles?username=uji" | \
-	jq '{zenn: [.articles[] | {title: .title, url: "https://zenn.dev/uji/articles/\(.slug)", published_at: .published_at}]}' > public/articles.json
+.PHONY: fetch-articles
+fetch-articles:
+	@echo "Fetching articles from Zenn and note..."
+	@( \
+		curl -s "https://zenn.dev/api/articles?username=uji" | \
+		jq '[.articles[] | {title: .title, url: "https://zenn.dev/uji/articles/\(.slug)", published_at: .published_at, platform: "zenn"}]'; \
+		curl -s "https://note.com/api/v2/creators/ujiii/contents?kind=note&page=1" | \
+		jq '[.data.contents[] | {title: .name, url: .noteUrl, published_at: .publishAt, platform: "note"}]' \
+	) | jq -s 'add | sort_by(.published_at) | reverse | {articles: .}' > public/articles.json
 	@echo "Updated public/articles.json"
 
 .PHONY: deploy

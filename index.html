@@ -299,18 +299,22 @@
     </footer>
 
     <script>
-      const zennIcon = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M.264 23.771h4.984c.264 0 .498-.147.645-.352L19.614.874c.176-.293-.029-.645-.381-.645h-4.72c-.235 0-.44.117-.557.323L.03 23.126c-.088.176.029.645.234.645zM17.445 23.419l6.479-10.408c.205-.323-.029-.733-.41-.733h-4.691c-.176 0-.352.088-.44.235l-6.655 10.643c-.176.264.029.616.352.616h4.926c.176 0 .352-.088.44-.353z" fill="#3EA8FF"/></svg>';
+      const icons = {
+        zenn: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M.264 23.771h4.984c.264 0 .498-.147.645-.352L19.614.874c.176-.293-.029-.645-.381-.645h-4.72c-.235 0-.44.117-.557.323L.03 23.126c-.088.176.029.645.234.645zM17.445 23.419l6.479-10.408c.205-.323-.029-.733-.41-.733h-4.691c-.176 0-.352.088-.44.235l-6.655 10.643c-.176.264.029.616.352.616h4.926c.176 0 .352-.088.44-.353z" fill="#3EA8FF"/></svg>',
+        note: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="20" height="20" rx="5" fill="#41C9B4"/><text x="12" y="17" text-anchor="middle" fill="white" font-family="Arial" font-size="14" font-weight="bold">n</text></svg>'
+      };
 
       fetch('/articles.json')
         .then(res => res.json())
         .then(data => {
           const container = document.getElementById('zenn-articles');
-          data.zenn.forEach(article => {
+          data.articles.forEach(article => {
             const a = document.createElement('a');
             a.href = article.url;
             a.className = 'article-card';
             const date = new Date(article.published_at).toLocaleDateString('ja-JP');
-            a.innerHTML = zennIcon + '<span><span class="article-title">' + article.title.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span><span class="article-date">' + date + '</span></span>';
+            const icon = icons[article.platform] || icons.zenn;
+            a.innerHTML = icon + '<span><span class="article-title">' + article.title.replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</span><span class="article-date">' + date + '</span></span>';
             a.target = '_blank';
             a.rel = 'noopener noreferrer';
             container.appendChild(a);
