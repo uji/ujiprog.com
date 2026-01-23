@@ -18,9 +18,22 @@ fetch-articles:
 	) | jq -s 'add | sort_by(.published_at) | reverse | {articles: .}' > public/articles.json
 	@echo "Updated public/articles.json"
 
+.PHONY: generate-articles
+generate-articles:
+	@echo "Generating articles from markdown..."
+	go run ./cmd/generate -articles=articles -output=public/articles -template=templates/article.html -og-template=templates/blog-ogp-tmpl.png -articles-json=public/articles.json
+	@echo "Article generation complete"
+
 .PHONY: deploy
 deploy:
 	npx wrangler r2 object put ujiprog-static/index.html --file=index.html --remote
 	npx wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --remote
 	npx wrangler r2 object put ujiprog-static/articles.json --file=public/articles.json --remote
+	@for file in public/articles/*.html public/articles/*.png; do \
+		if [ -f "$$file" ]; then \
+			filename=$$(basename "$$file"); \
+			echo "Uploading articles/$$filename..."; \
+			npx wrangler r2 object put "ujiprog-static/articles/$$filename" --file="$$file" --remote; \
+		fi \
+	done
 	npm run deploy

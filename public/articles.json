@@ -1,6 +1,12 @@
 {
   "articles": [
     {
+      "title": "自分のブログを syumai/workers(Go) で作った話",
+      "url": "/articles/2026-01-22_created-my-own-blog",
+      "published_at": "2026-01-22T00:00:00Z",
+      "platform": "blog"
+    },
+    {
       "title": "Go Workshop Conference 2025 IN KOBE 参加レポート",
       "url": "https://zenn.dev/uji/articles/go-workshop-conference-2025",
       "published_at": "2026-01-11T12:00:01.319+09:00",

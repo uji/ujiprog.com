@@ -6,7 +6,7 @@
 		"build": "go run github.com/syumai/workers/cmd/workers-assets-gen -mode=go && GOOS=js GOARCH=wasm go build -o ./build/app.wasm .",
 		"deploy": "wrangler deploy",
 		"dev": "npm run dev:assets && wrangler dev",
-		"dev:assets": "wrangler r2 object put ujiprog-static/index.html --file=index.html --local && wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --local && wrangler r2 object put ujiprog-static/favicon.ico --file=public/favicon.ico --local",
+		"dev:assets": "wrangler r2 object put ujiprog-static/index.html --file=index.html --local && wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --local && wrangler r2 object put ujiprog-static/favicon.ico --file=public/favicon.ico --local && wrangler r2 object put ujiprog-static/articles.json --file=public/articles.json --local && for f in public/articles/*; do [ -f \"$f\" ] && wrangler r2 object put \"ujiprog-static/articles/$(basename $f)\" --file=\"$f\" --local; done",
 		"start": "wrangler dev --remote"
 	},
 	"devDependencies": {

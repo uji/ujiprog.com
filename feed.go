@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/syumai/workers/cloudflare/r2"
@@ -92,11 +93,16 @@ func feedHandler(w http.ResponseWriter, req *http.Request) {
 		if t, err := time.Parse(time.RFC3339, article.PublishedAt); err == nil {
 			pubDate = t.Format(time.RFC1123Z)
 		}
+		// Convert relative path to absolute URL for RSS feed
+		link := article.URL
+		if strings.HasPrefix(link, "/") {
+			link = "https://ujiprog.com" + link
+		}
 		items = append(items, Item{
 			Title: article.Title,
-			Link:  article.URL,
+			Link:  link,
 			GUID: GUID{
-				Value:       article.URL,
+				Value:       link,
 				IsPermaLink: "true",
 			},
 			PubDate:     pubDate,
