@@ -1,7 +1,7 @@
 ---
 name: verify-browser
 description: ローカル開発サーバーでの動作確認。HTML/CSS/JSの変更後、APIエンドポイント追加後、UIの見た目を確認したい時に使用。「ブラウザで確認」「動作確認して」「表示を確認」などのリクエストで発動。
-allowed-tools: Bash(agent-browser:*), SKILL(agent-browser)
+allowed-tools: Bash(agent-browser:*), SKILL(agent-browser), Read(/tmp/**)
 ---
 
 # ブラウザ確認
