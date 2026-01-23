@@ -3,17 +3,20 @@ package markdown
 import (
 	"bytes"
 	"html/template"
+	"net/url"
 	"os"
 	"path/filepath"
 )
 
 // TemplateData represents the data passed to the article template
 type TemplateData struct {
-	Title       string
-	PublishedAt string
-	Content     template.HTML
-	OGImageURL  string
-	ArticleURL  string
+	Title           string
+	PublishedAt     string
+	Content         template.HTML
+	OGImageURL      string
+	ArticleURL      string
+	TwitterShareURL template.URL
+	HatenaShareURL  template.URL
 }
 
 // Renderer handles HTML template rendering for articles
@@ -32,12 +35,21 @@ func NewRenderer(templatePath string) (*Renderer, error) {
 
 // Render renders a ParsedArticle to HTML using the template
 func (r *Renderer) Render(article *ParsedArticle) (string, error) {
+	articleURL := "https://ujiprog.com/articles/" + article.Filename
+	encodedURL := url.QueryEscape(articleURL)
+	encodedTitle := url.QueryEscape(article.Meta.Title)
+
+	twitterShareURL := "https://twitter.com/intent/tweet?url=" + encodedURL + "&text=" + encodedTitle
+	hatenaShareURL := "https://b.hatena.ne.jp/add?mode=confirm&url=" + encodedURL + "&title=" + encodedTitle
+
 	data := TemplateData{
-		Title:       article.Meta.Title,
-		PublishedAt: article.Meta.PublishedAt.Format("2006-01-02"),
-		Content:     template.HTML(article.Content),
-		OGImageURL:  "https://ujiprog.com/articles/" + article.Filename + ".png",
-		ArticleURL:  "https://ujiprog.com/articles/" + article.Filename,
+		Title:           article.Meta.Title,
+		PublishedAt:     article.Meta.PublishedAt.Format("2006-01-02"),
+		Content:         template.HTML(article.Content),
+		OGImageURL:      "https://ujiprog.com/articles/" + article.Filename + ".png",
+		ArticleURL:      articleURL,
+		TwitterShareURL: template.URL(twitterShareURL),
+		HatenaShareURL:  template.URL(hatenaShareURL),
 	}
 
 	var buf bytes.Buffer

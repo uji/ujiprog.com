@@ -121,10 +121,65 @@
         margin-bottom: 0.75rem;
       }
 
+      .article-meta-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
       .article-meta {
         font-size: 0.9rem;
         color: #4A4B4A;
         opacity: 0.6;
+      }
+
+      /* Share links */
+      .share-links {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .share-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        color: #4A4B4A;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        background: rgba(255, 255, 255, 0.5);
+        border: none;
+        cursor: pointer;
+      }
+
+      .share-icon:hover {
+        background: #FDF4CD;
+        transform: scale(1.1);
+      }
+
+      .share-icon svg {
+        width: 18px;
+        height: 18px;
+      }
+
+      .share-icon.copied {
+        background: #4A4B4A;
+        color: white;
+      }
+
+      @media (max-width: 480px) {
+        .share-icon {
+          width: 28px;
+          height: 28px;
+        }
+
+        .share-icon svg {
+          width: 16px;
+          height: 16px;
+        }
       }
 
       /* Article content */
@@ -421,7 +476,21 @@
       <article>
         <header class="article-header">
           <h1 class="article-title">{{.Title}}</h1>
-          <p class="article-meta">{{.PublishedAt}}</p>
+          <div class="article-meta-row">
+            <p class="article-meta">{{.PublishedAt}}</p>
+            <div class="share-links">
+            <a href="{{.TwitterShareURL}}" target="_blank" rel="noopener noreferrer" class="share-icon" aria-label="Share on X (Twitter)">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="{{.HatenaShareURL}}" target="_blank" rel="noopener noreferrer" class="share-icon" aria-label="Share on Hatena Bookmark">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M20.47 0H3.53C1.58 0 0 1.58 0 3.53v16.94C0 22.42 1.58 24 3.53 24h16.94c1.95 0 3.53-1.58 3.53-3.53V3.53C24 1.58 22.42 0 20.47 0zM6.95 18.47h-2.4V5.53h2.4v12.94zm9.6 0h-2.4v-4.8h-2.4v4.8h-2.4V5.53h2.4v4.8h2.4v-4.8h2.4v12.94zm2.4 0h-1.2v-1.2h1.2v1.2z"/></svg>
+            </a>
+            <button type="button" class="share-icon" id="copy-link-btn" aria-label="Copy link" data-url="{{.ArticleURL}}">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="link-icon"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="check-icon" style="display: none;"><polyline points="20 6 9 17 4 12"/></svg>
+            </button>
+            </div>
+          </div>
         </header>
         <div class="article-content">
           {{.Content}}
@@ -443,5 +512,25 @@
     </footer>
 
     <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+    <script>
+      document.getElementById('copy-link-btn').addEventListener('click', function() {
+        var btn = this;
+        var url = btn.getAttribute('data-url');
+        var linkIcon = btn.querySelector('.link-icon');
+        var checkIcon = btn.querySelector('.check-icon');
+
+        navigator.clipboard.writeText(url).then(function() {
+          btn.classList.add('copied');
+          linkIcon.style.display = 'none';
+          checkIcon.style.display = 'block';
+
+          setTimeout(function() {
+            btn.classList.remove('copied');
+            linkIcon.style.display = 'block';
+            checkIcon.style.display = 'none';
+          }, 2000);
+        });
+      });
+    </script>
   </body>
 </html>
