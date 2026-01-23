@@ -48,6 +48,18 @@
         max-width: 800px;
         padding: 2rem;
         animation: fadeInUp 1s ease-out;
+        position: relative;
+      }
+
+      .header-avatar {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        object-fit: cover;
       }
 
       .back-link {
@@ -402,6 +414,7 @@
         </svg>
         Back to Home
       </a>
+      <img src="/avator.jpg" alt="uji's avatar" class="header-avatar" />
     </header>
 
     <main>
