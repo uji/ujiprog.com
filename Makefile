@@ -57,7 +57,7 @@ generate-articles:
 	@echo "Article generation complete"
 
 .PHONY: deploy
-deploy:
+deploy: generate-articles
 	npx wrangler r2 object put ujiprog-static/index.html --file=index.html --remote
 	npx wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --remote
 	npx wrangler r2 object put ujiprog-static/articles.json --file=public/articles.json --remote
