@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/fogleman/gg"
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
+	"golang.org/x/image/math/fixed"
 )
 
 // FontConfig holds font configuration for OG image generation
@@ -123,28 +123,25 @@ func segmentText(text string) []textSegment {
 	return segments
 }
 
-// drawTextWithMergedMask draws text using a luminance-based alpha mask
-// Renders black text on white background, then uses inverted luminance as alpha
-// This avoids transparency accumulation issues at glyph intersections
-func (g *OGImageGenerator) drawTextWithMergedMask(dc *gg.Context, line string, centerX, y float64, textColor color.Color) {
+// drawTextDirect draws text directly using font.Drawer for accurate glyph coverage
+// This method uses FreeType's coverage bitmap directly, avoiding quantization errors
+func (g *OGImageGenerator) drawTextDirect(dst draw.Image, line string, centerX, y float64, textColor color.Color) {
 	segments := segmentText(line)
+	totalWidth := g.measureLineWidth(line)
 
-	// Calculate total width first
-	totalWidth := g.measureLineWidth(dc, line)
+	// Calculate starting X position for centered text
+	x := int(centerX - totalWidth/2)
 
-	// Create a temporary context with white background for rendering
-	bounds := dc.Image().Bounds()
-	tmpDc := gg.NewContext(bounds.Dx(), bounds.Dy())
+	// Calculate baseline Y position (y is vertical center, adjust for ascent)
+	var ascent fixed.Int26_6
+	if g.japaneseFace != nil {
+		ascent = g.japaneseFace.Metrics().Ascent
+	} else if g.asciiFace != nil {
+		ascent = g.asciiFace.Metrics().Ascent
+	}
+	yBaseline := int(y) + ascent.Round()/2
 
-	// Fill with white background
-	tmpDc.SetRGB(1, 1, 1)
-	tmpDc.Clear()
-
-	// Set black color for text
-	tmpDc.SetRGB(0, 0, 0)
-
-	// Start drawing from left side of centered text
-	x := centerX - totalWidth/2
+	src := image.NewUniform(textColor)
 
 	for _, seg := range segments {
 		var face font.Face
@@ -156,32 +153,14 @@ func (g *OGImageGenerator) drawTextWithMergedMask(dc *gg.Context, line string, c
 			continue
 		}
 
-		tmpDc.SetFontFace(face)
-		tmpDc.DrawStringAnchored(seg.text, x, y, 0, 0.5)
-		w, _ := tmpDc.MeasureString(seg.text)
-		x += w
-	}
-
-	// Extract alpha mask from the rendered image's luminance
-	tmpImg := tmpDc.Image()
-	mask := image.NewAlpha(bounds)
-
-	for py := bounds.Min.Y; py < bounds.Max.Y; py++ {
-		for px := bounds.Min.X; px < bounds.Max.X; px++ {
-			// Get pixel color from temporary image
-			c := tmpImg.At(px, py)
-			r, _, _, _ := c.RGBA()
-			// Convert to 8-bit and invert: white (255) -> 0 alpha, black (0) -> 255 alpha
-			alpha := uint8(255 - (r >> 8))
-			mask.SetAlpha(px, py, color.Alpha{A: alpha})
+		d := &font.Drawer{
+			Dst:  dst,
+			Src:  src,
+			Face: face,
+			Dot:  fixed.P(x, yBaseline),
 		}
-	}
-
-	// Draw the mask onto the context with the text color
-	dst := dc.Image()
-	if rgba, ok := dst.(*image.RGBA); ok {
-		src := image.NewUniform(textColor)
-		draw.DrawMask(rgba, bounds, src, image.Point{}, mask, image.Point{}, draw.Over)
+		d.DrawString(seg.text)
+		x = d.Dot.X.Round()
 	}
 }
 
@@ -197,11 +176,9 @@ func (g *OGImageGenerator) Generate(title, outputPath string) error {
 	width := bounds.Dx()
 	height := bounds.Dy()
 
-	// Create drawing context
-	dc := gg.NewContext(width, height)
-
-	// Draw template as background
-	dc.DrawImage(templateImg, 0, 0)
+	// Create RGBA image and draw template as background
+	dst := image.NewRGBA(bounds)
+	draw.Draw(dst, bounds, templateImg, bounds.Min, draw.Src)
 
 	// Text color (dark gray to match site design)
 	textColor := color.RGBA{R: 74, G: 75, B: 74, A: 255}
@@ -217,7 +194,7 @@ func (g *OGImageGenerator) Generate(title, outputPath string) error {
 	// Wrap each line if necessary
 	var allLines []string
 	for _, line := range explicitLines {
-		wrapped := g.wrapTextMultiFont(dc, line, maxWidth)
+		wrapped := g.wrapTextMultiFont(line, maxWidth)
 		allLines = append(allLines, wrapped...)
 	}
 
@@ -225,27 +202,20 @@ func (g *OGImageGenerator) Generate(title, outputPath string) error {
 	lineHeight := g.fontConfig.FontSize * 1.25
 	totalTextHeight := float64(len(allLines)) * lineHeight
 
-	// Draw each line centered using merged mask method (prevents transparency at glyph intersections)
+	// Draw each line centered using direct font.Drawer (accurate glyph coverage)
 	startY := textAreaY - totalTextHeight/2 + lineHeight/2
 	for i, line := range allLines {
 		y := startY + float64(i)*lineHeight
-		g.drawTextWithMergedMask(dc, line, textAreaX, y, textColor)
+		g.drawTextDirect(dst, line, textAreaX, y, textColor)
 	}
 
 	// Save to file
-	return dc.SavePNG(outputPath)
+	return savePNG(outputPath, dst)
 }
 
 // wrapTextMultiFont wraps text considering multiple fonts
-func (g *OGImageGenerator) wrapTextMultiFont(dc *gg.Context, text string, maxWidth float64) []string {
+func (g *OGImageGenerator) wrapTextMultiFont(text string, maxWidth float64) []string {
 	var lines []string
-
-	// Use Japanese font for measurement if available (typically wider)
-	if g.japaneseFace != nil {
-		dc.SetFontFace(g.japaneseFace)
-	} else if g.asciiFace != nil {
-		dc.SetFontFace(g.asciiFace)
-	}
 
 	// Measure and wrap character by character for accuracy with mixed fonts
 	runes := []rune(text)
@@ -256,7 +226,7 @@ func (g *OGImageGenerator) wrapTextMultiFont(dc *gg.Context, text string, maxWid
 	currentLine := ""
 	for _, r := range runes {
 		testLine := currentLine + string(r)
-		lineWidth := g.measureLineWidth(dc, testLine)
+		lineWidth := g.measureLineWidth(testLine)
 
 		if lineWidth <= maxWidth {
 			currentLine = testLine
@@ -276,21 +246,24 @@ func (g *OGImageGenerator) wrapTextMultiFont(dc *gg.Context, text string, maxWid
 }
 
 // measureLineWidth measures the width of a line considering multiple fonts
-func (g *OGImageGenerator) measureLineWidth(dc *gg.Context, line string) float64 {
+func (g *OGImageGenerator) measureLineWidth(line string) float64 {
 	segments := segmentText(line)
-	totalWidth := 0.0
+	var totalWidth fixed.Int26_6
 
 	for _, seg := range segments {
+		var face font.Face
 		if seg.isJapanese && g.japaneseFace != nil {
-			dc.SetFontFace(g.japaneseFace)
+			face = g.japaneseFace
 		} else if g.asciiFace != nil {
-			dc.SetFontFace(g.asciiFace)
+			face = g.asciiFace
+		} else {
+			continue
 		}
-		w, _ := dc.MeasureString(seg.text)
+		w := font.MeasureString(face, seg.text)
 		totalWidth += w
 	}
 
-	return totalWidth
+	return float64(totalWidth) / 64.0 // Convert from fixed.Int26_6 to float64
 }
 
 // loadPNG loads a PNG image from file
@@ -302,4 +275,15 @@ func loadPNG(path string) (image.Image, error) {
 	defer f.Close()
 
 	return png.Decode(f)
+}
+
+// savePNG saves an image to a PNG file
+func savePNG(path string, img image.Image) error {
+	f, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	return png.Encode(f, img)
 }
