@@ -16,8 +16,17 @@ import (
 
 // ArticleMeta represents the YAML frontmatter metadata
 type ArticleMeta struct {
-	Title       string
-	PublishedAt time.Time
+	Title        string
+	DisplayTitle string // OG画像用タイトル（改行\nをサポート）
+	PublishedAt  time.Time
+}
+
+// OGTitle returns the title for OG image (DisplayTitle if set, otherwise Title)
+func (m ArticleMeta) OGTitle() string {
+	if m.DisplayTitle != "" {
+		return m.DisplayTitle
+	}
+	return m.Title
 }
 
 // ParsedArticle represents a parsed markdown article
@@ -111,6 +120,11 @@ func extractMeta(metaData map[string]interface{}) ArticleMeta {
 
 	if title, ok := metaData["title"].(string); ok {
 		am.Title = title
+	}
+
+	if displayTitle, ok := metaData["display_title"].(string); ok {
+		// \n を実際の改行に変換
+		am.DisplayTitle = strings.ReplaceAll(displayTitle, "\\n", "\n")
 	}
 
 	if publishedAt, ok := metaData["published_at"].(string); ok {

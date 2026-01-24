@@ -18,3 +18,12 @@ make dev               # ローカル R2 にアセットを配置して wrangler
 make generate-articles # 記事 HTML ページを生成
 make deploy            # R2 にアセットをアップロードし、Cloudflare Workers にデプロイ
 ```
+
+## OG画像生成のためのフォント設定
+
+記事の OG 画像を生成するには、以下のフォントファイルが必要です：
+
+- `fonts/DMSans_36pt-Regular.ttf` - ASCII/英数字用
+ - [Google Fonts](https://fonts.google.com/specimen/DM+Sans) からダウンロード
+- `fonts/NotoSansJP-Regular.ttf` - 日本語用
+ - [Google Fonts](https://fonts.google.com/noto/specimen/Noto+Sans+JP) からダウンロード

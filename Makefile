@@ -41,7 +41,15 @@ fetch-articles:
 generate-articles:
 	@echo "Generating articles from markdown..."
 	mkdir -p .generated/articles
-	go run ./cmd/generate -articles=articles -output=.generated/articles -template=templates/article.html -og-template=templates/blog-ogp-tmpl.png -articles-json=public/articles.json
+	go run ./cmd/generate \
+		-articles=articles \
+		-output=.generated/articles \
+		-template=templates/article.html \
+		-og-template=templates/blog-ogp-tmpl.png \
+		-ascii-font=fonts/DMSans_36pt-Regular.ttf \
+		-japanese-font=fonts/NotoSansJP-Regular.ttf \
+		-font-size=48 \
+		-articles-json=public/articles.json
 	@echo "Article generation complete"
 
 .PHONY: deploy

@@ -29,7 +29,9 @@ func main() {
 	outputDir := flag.String("output", "build/articles", "Directory to output generated HTML and images")
 	templatePath := flag.String("template", "templates/article.html", "Path to article HTML template")
 	ogTemplatePath := flag.String("og-template", "templates/blog-ogp-tmpl.png", "Path to OG image template")
-	fontPath := flag.String("font", "", "Path to font file for OG image generation (optional)")
+	asciiFontPath := flag.String("ascii-font", "", "Path to ASCII font file for OG image generation")
+	japaneseFontPath := flag.String("japanese-font", "", "Path to Japanese font file for OG image generation")
+	fontSize := flag.Float64("font-size", 48, "Font size for OG image text")
 	articlesJSONPath := flag.String("articles-json", "public/articles.json", "Path to articles.json for merging")
 	flag.Parse()
 
@@ -56,10 +58,15 @@ func main() {
 		log.Fatalf("Failed to create renderer: %v", err)
 	}
 
-	// Create OG image generator if font is provided
+	// Create OG image generator if fonts are provided
 	var ogGenerator *markdown.OGImageGenerator
-	if *fontPath != "" {
-		ogGenerator = markdown.NewOGImageGenerator(*ogTemplatePath, *fontPath)
+	if *asciiFontPath != "" && *japaneseFontPath != "" {
+		fontConfig := markdown.FontConfig{
+			ASCIIFontPath:    *asciiFontPath,
+			JapaneseFontPath: *japaneseFontPath,
+			FontSize:         *fontSize,
+		}
+		ogGenerator = markdown.NewOGImageGenerator(*ogTemplatePath, fontConfig)
 	}
 
 	// Process each markdown file
@@ -84,7 +91,7 @@ func main() {
 		// Generate OG image if generator is available
 		if ogGenerator != nil {
 			ogOutputPath := filepath.Join(*outputDir, article.Filename+".png")
-			if err := ogGenerator.Generate(article.Meta.Title, ogOutputPath); err != nil {
+			if err := ogGenerator.Generate(article.Meta.OGTitle(), ogOutputPath); err != nil {
 				log.Printf("Failed to generate OG image for %s: %v", mdFile, err)
 			} else {
 				log.Printf("Generated: %s", ogOutputPath)
