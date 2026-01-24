@@ -176,13 +176,23 @@ article {
   position: relative;
 }
 
+.article-content h2 .heading-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.article-content h2 .heading-link:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
 .article-content h2 .heading-anchor {
   position: absolute;
-  left: -2rem;
+  left: -1.75rem;
   top: 50%;
   transform: translateY(-50%);
-  opacity: 0;
-  transition: opacity 0.2s ease;
+  opacity: 0.4;
+  transition: all 0.2s ease;
   text-decoration: none;
   color: #4A4B4A;
   display: flex;
@@ -190,19 +200,17 @@ article {
   justify-content: center;
   width: 1.5rem;
   height: 1.5rem;
-}
-
-.article-content h2:hover .heading-anchor {
-  opacity: 0.5;
+  border-radius: 4px;
 }
 
 .article-content h2 .heading-anchor:hover {
   opacity: 1;
+  background: #FDF4CD;
 }
 
 .article-content h2 .heading-anchor svg {
-  width: 1.25rem;
-  height: 1.25rem;
+  width: 1rem;
+  height: 1rem;
 }
 
 .article-content h3 {
