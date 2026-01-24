@@ -10,6 +10,34 @@ import (
 )
 
 func main() {
+	http.HandleFunc("/robots.txt", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Write([]byte(`User-agent: *
+Allow: /
+Allow: /articles/
+Allow: /feed.xml
+Allow: /avator.jpg
+
+Sitemap: https://ujiprog.com/sitemap.xml`))
+	})
+	http.HandleFunc("/sitemap.xml", func(w http.ResponseWriter, req *http.Request) {
+		w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+		w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://ujiprog.com/</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://ujiprog.com/feed.xml</loc>
+    <lastmod>2026-01-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>`))
+	})
 	http.HandleFunc("/articles.json", func(w http.ResponseWriter, req *http.Request) {
 		bucket, err := r2.NewBucket("STATIC_BUCKET")
 		if err != nil {
@@ -44,6 +72,9 @@ func main() {
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' blob:; script-src 'unsafe-inline';")
 		w.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
 
 		io.Copy(w, obj.Body)
@@ -92,6 +123,9 @@ func articlesHandler(w http.ResponseWriter, req *http.Request) {
 	if contentType == "text/html; charset=utf-8" {
 		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data: blob:; script-src 'unsafe-inline' https://platform.twitter.com;")
 		w.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
+		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
 	}
 
