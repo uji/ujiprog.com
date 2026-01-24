@@ -10,10 +10,6 @@ import (
 )
 
 func main() {
-	http.HandleFunc("/hello", func(w http.ResponseWriter, req *http.Request) {
-		msg := "Hello!"
-		w.Write([]byte(msg))
-	})
 	http.HandleFunc("/articles.json", func(w http.ResponseWriter, req *http.Request) {
 		bucket, err := r2.NewBucket("STATIC_BUCKET")
 		if err != nil {
