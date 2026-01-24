@@ -8,8 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
+	"golang.org/x/image/font/opentype"
+	"golang.org/x/image/font/sfnt"
 	"golang.org/x/image/math/fixed"
 )
 
@@ -59,16 +60,16 @@ func loadFontFace(path string, size float64) (font.Face, error) {
 		return nil, err
 	}
 
-	f, err := truetype.Parse(fontBytes)
+	f, err := sfnt.Parse(fontBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	return truetype.NewFace(f, &truetype.Options{
+	return opentype.NewFace(f, &opentype.FaceOptions{
 		Size:    size,
 		DPI:     72,
 		Hinting: font.HintingFull,
-	}), nil
+	})
 }
 
 // textSegment represents a segment of text with its font type
