@@ -121,6 +121,12 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 	http.HandleFunc("/feed.xml", feedHandler)
 	http.HandleFunc("/articles/", articlesHandler)
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
+		// Redirect unknown paths to root
+		if req.URL.Path != "/" {
+			http.Redirect(w, req, "/", http.StatusFound)
+			return
+		}
+
 		bucket, err := r2.NewBucket("STATIC_BUCKET")
 		if err != nil {
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
