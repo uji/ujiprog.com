@@ -23,7 +23,7 @@ make deploy            # R2 にアセットをアップロードし、Cloudflare
 
 記事の OG 画像を生成するには、以下のフォントファイルが必要です：
 
-- `fonts/DMSans_36pt-Regular.ttf` - ASCII/英数字用
+- `fonts/DMSans-Bold.ttf` - ASCII/英数字用
  - [Google Fonts](https://fonts.google.com/specimen/DM+Sans) からダウンロード
-- `fonts/NotoSansJP-Regular.ttf` - 日本語用
+- `fonts/NotoSansJP-Bold.ttf` - 日本語用
  - [Google Fonts](https://fonts.google.com/noto/specimen/Noto+Sans+JP) からダウンロード
