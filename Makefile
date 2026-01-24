@@ -13,6 +13,10 @@ dev:
 	npx wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --local
 	npx wrangler r2 object put ujiprog-static/favicon.ico --file=public/favicon.ico --local
 	npx wrangler r2 object put ujiprog-static/articles.json --file=public/articles.json --local
+	npx wrangler r2 object put ujiprog-static/style.css --file=public/style.css --local
+	npx wrangler r2 object put ujiprog-static/article.css --file=public/article.css --local
+	npx wrangler r2 object put ujiprog-static/main.js --file=public/main.js --local
+	npx wrangler r2 object put ujiprog-static/article.js --file=public/article.js --local
 	@for f in .generated/articles/*; do \
 		if [ -f "$$f" ]; then \
 			echo "Uploading: $$f"; \
@@ -57,6 +61,10 @@ deploy:
 	npx wrangler r2 object put ujiprog-static/index.html --file=index.html --remote
 	npx wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --remote
 	npx wrangler r2 object put ujiprog-static/articles.json --file=public/articles.json --remote
+	npx wrangler r2 object put ujiprog-static/style.css --file=public/style.css --remote
+	npx wrangler r2 object put ujiprog-static/article.css --file=public/article.css --remote
+	npx wrangler r2 object put ujiprog-static/main.js --file=public/main.js --remote
+	npx wrangler r2 object put ujiprog-static/article.js --file=public/article.js --remote
 	@for file in .generated/articles/*.html .generated/articles/*.png; do \
 		if [ -f "$$file" ]; then \
 			filename=$$(basename "$$file"); \
