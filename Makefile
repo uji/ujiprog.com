@@ -2,6 +2,25 @@
 run:
 	go tool air
 
+.PHONY: build
+build:
+	go run github.com/syumai/workers/cmd/workers-assets-gen -mode=go
+	GOOS=js GOARCH=wasm go build -o ./build/app.wasm .
+
+.PHONY: dev
+dev:
+	npx wrangler r2 object put ujiprog-static/index.html --file=index.html --local
+	npx wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --local
+	npx wrangler r2 object put ujiprog-static/favicon.ico --file=public/favicon.ico --local
+	npx wrangler r2 object put ujiprog-static/articles.json --file=public/articles.json --local
+	@for f in .generated/articles/*; do \
+		if [ -f "$$f" ]; then \
+			echo "Uploading: $$f"; \
+			npx wrangler r2 object put "ujiprog-static/articles/$$(basename $$f)" --file="$$f" --local; \
+		fi; \
+	done
+	npx wrangler dev
+
 .PHONY: fetch-articles
 fetch-articles:
 	@echo "Fetching articles from Zenn, note, and SpeakerDeck..."
@@ -21,8 +40,8 @@ fetch-articles:
 .PHONY: generate-articles
 generate-articles:
 	@echo "Generating articles from markdown..."
-	mkdir -p build/articles
-	go run ./cmd/generate -articles=articles -output=build/articles -template=templates/article.html -og-template=templates/blog-ogp-tmpl.png -articles-json=public/articles.json
+	mkdir -p .generated/articles
+	go run ./cmd/generate -articles=articles -output=.generated/articles -template=templates/article.html -og-template=templates/blog-ogp-tmpl.png -articles-json=public/articles.json
 	@echo "Article generation complete"
 
 .PHONY: deploy
@@ -30,11 +49,12 @@ deploy:
 	npx wrangler r2 object put ujiprog-static/index.html --file=index.html --remote
 	npx wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --remote
 	npx wrangler r2 object put ujiprog-static/articles.json --file=public/articles.json --remote
-	@for file in build/articles/*.html build/articles/*.png; do \
+	@for file in .generated/articles/*.html .generated/articles/*.png; do \
 		if [ -f "$$file" ]; then \
 			filename=$$(basename "$$file"); \
 			echo "Uploading articles/$$filename..."; \
 			npx wrangler r2 object put "ujiprog-static/articles/$$filename" --file="$$file" --remote; \
 		fi \
 	done
-	npm run deploy
+	$(MAKE) build
+	npx wrangler deploy

@@ -15,9 +15,14 @@ make run           # Air を使用してホットリロードで開発サーバ�
 
 ### ビルドとデプロイ
 ```bash
-GOOS=js GOARCH=wasm go build -o ./build/app.wasm . # Go コードのビルドが通ることを確認する
-make generate-articles                             # HTMLページの生成
-npm run deploy                                     # Workers デプロイ用の Go Wasm バイナリをビルドし、Cloudflare Workers にデプロイ
+make build              # Go Wasm バイナリをビルド
+make generate-articles  # HTMLページの生成
+make deploy             # R2 にアセットをアップロードし、Cloudflare Workers にデプロイ
+```
+
+### ローカル開発 (Wrangler)
+```bash
+make dev                # ローカル R2 にアセットを配置して wrangler dev を起動
 ```
 
 ## コードスタイルガイドライン
@@ -43,12 +48,45 @@ npm run deploy                                     # Workers デプロイ用の 
 ### ファイル構造
 - `main.go`: エントリーポイントと HTTP ハンドラー
 - `go.mod`: Go モジュール定義
-- `package.json`: Node.js 依存関係とビルドスクリプト
-- `Makefile`: 追加のビルドコマンド
+- `package.json`: Node.js 依存関係 (wrangler のみ、スクリプトは定義しない)
+- `Makefile`: ビルド・開発・デプロイコマンド
+
+### 重要: ビルドスクリプトの統一
+- **ビルドスクリプトは Makefile に統一する**
+- package.json には npm スクリプトを定義しない (依存関係の管理のみ)
+- wrangler.jsonc の `build.command` も `make build` を使用する
 
 ### 開発ワークフロー
-1. 開発中のホットリロードに `make run` を使用
-2. 変更をコミットする前に `go test ./...` を実行
-3. コードフォーマットを確保するために `go fmt ./...` を使用
-4. /verify-browser で描画を確認
+
+#### ローカル開発
+```bash
+make run           # Air によるホットリロード開発
+                   # Go/HTML/Markdown の変更 → 記事生成 → ビルド → サーバー再起動
+```
+
+#### 外部記事の取得（Zenn/note/SpeakerDeck）
+```bash
+make fetch-articles    # APIから最新記事一覧を取得 → public/articles.json
+```
+
+#### 本番デプロイ
+```bash
+make fetch-articles      # 外部記事を最新化（任意）
+make generate-articles   # ローカル記事をビルド
+make deploy              # R2 アップロード + Workers デプロイ
+```
+
+#### コマンド早見表
+| コマンド | 用途 |
+|----------|------|
+| `make run` | ホットリロード開発（Go/HTML/Markdown 全対応） |
+| `make fetch-articles` | 外部記事一覧を更新 |
+| `make deploy` | 本番環境へデプロイ |
+
+#### 品質チェック
+```bash
+go test ./...      # テスト実行
+go fmt ./...       # フォーマット
+/verify-browser    # ブラウザで描画確認
+```
 

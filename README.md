@@ -7,12 +7,14 @@
 - Node.js
 - Go 1.24.0 or later
 
-### Commands
+## Commands
 
-```
-npm start      # run dev server
-# or
-go run .       # run dev server without Wrangler (Cloudflare-related features are not available)
-npm run build  # build Go Wasm binary
-npm run deploy # deploy worker
+ビルドスクリプトは Makefile に統一しています。package.json には npm スクリプトを定義しません。
+
+```bash
+make run               # Air を使用してホットリロードで開発サーバーを起動
+make build             # Go Wasm バイナリをビルド
+make dev               # ローカル R2 にアセットを配置して wrangler dev を起動
+make generate-articles # 記事 HTML ページを生成
+make deploy            # R2 にアセットをアップロードし、Cloudflare Workers にデプロイ
 ```

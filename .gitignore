@@ -1,4 +1,5 @@
 build
+.generated
 tmp
 node_modules
 .wrangler
