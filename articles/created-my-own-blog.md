@@ -14,7 +14,7 @@ https://ujiprog.com
 
 ## 構成
 
-[syumai/workers](https://github.com/syumai/workers) で簡単なハンドラーを実装し、HTML や OG 画像等アセットは自動生成のコマンドを実装し、成果物を Cloudflare R2 に上げてます。
+[syumai/workers](https://github.com/syumai/workers) で簡単なハンドラーを実装。記事の HTML や OG 画像等アセットは自前のコマンドで自動生成し、成果物を Cloudflare R2 に上げてます。
 [Astro](https://astro.build/) を使って今のスタンダードっぽくやるつもりが気づけば Gopher スタックになってました。
 
 ### syumai/workers
@@ -30,11 +30,12 @@ Go は実行ファイルがランタイム（プログラム実行時に必要�
 
 ### アセットの自動生成
 
+記事は Markdown で書きたかったので、Markdown からテンプレートをもとに静的な HTML のページを生成するスタイルにしました。
 Markdown パーサーの yuin/goldmark (CommonMark 完全準拠の狂気のライブラリ）と html/template や image などの標準/準標準パッケージを使って素朴に実装してます。
 
 https://github.com/yuin/goldmark
 
-Markdown の AST を HTML に変換する部分は自分が使いたい Markdown 構文のみをミニマムにサポートしてます。
+Markdown の AST を HTML に変換する部分は、自分が使いたい Markdown 構文のみをミニマムにサポートしてます。
 
 - URL のみの段落をOGカードに展開
 - YAML front matter (Markdown 上部に書くフィールド) を使ったロジック実装
