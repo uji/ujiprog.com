@@ -26,7 +26,7 @@ type Article struct {
 
 func main() {
 	articlesDir := flag.String("articles", "articles", "Directory containing markdown articles")
-	outputDir := flag.String("output", "public/articles", "Directory to output generated HTML and images")
+	outputDir := flag.String("output", "build/articles", "Directory to output generated HTML and images")
 	templatePath := flag.String("template", "templates/article.html", "Path to article HTML template")
 	ogTemplatePath := flag.String("og-template", "templates/blog-ogp-tmpl.png", "Path to OG image template")
 	fontPath := flag.String("font", "", "Path to font file for OG image generation (optional)")
