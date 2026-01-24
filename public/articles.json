@@ -1,9 +1,9 @@
 {
   "articles": [
     {
-      "title": "自分のブログを syumai/workers(Go) で作った話",
-      "url": "/articles/2026-01-22_created-my-own-blog",
-      "published_at": "2026-01-22T00:00:00Z",
+      "title": "自分のブログを syumai/workers(Go) で作った",
+      "url": "/articles/created-my-own-blog",
+      "published_at": "2026-01-24T00:00:00Z",
       "platform": "blog"
     },
     {
