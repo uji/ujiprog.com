@@ -48,7 +48,7 @@ generate-articles:
 		-og-template=templates/blog-ogp-tmpl.png \
 		-ascii-font=fonts/DMSans_36pt-Regular.ttf \
 		-japanese-font=fonts/NotoSansJP-Regular.ttf \
-		-font-size=48 \
+		-font-size=56 \
 		-articles-json=public/articles.json
 	@echo "Article generation complete"
 

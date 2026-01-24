@@ -199,7 +199,7 @@ func (g *OGImageGenerator) Generate(title, outputPath string) error {
 	}
 
 	// Calculate total height of text block
-	lineHeight := g.fontConfig.FontSize * 1.25
+	lineHeight := g.fontConfig.FontSize * 1.5
 	totalTextHeight := float64(len(allLines)) * lineHeight
 
 	// Draw each line centered using direct font.Drawer (accurate glyph coverage)
