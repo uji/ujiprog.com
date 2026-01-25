@@ -174,6 +174,7 @@ article {
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #B0E7FC;
   position: relative;
+  scroll-margin-top: 2rem;
 }
 
 .article-content h2 .heading-link {
@@ -189,7 +190,7 @@ article {
 .article-content h2 .heading-anchor {
   position: absolute;
   left: -1.75rem;
-  top: 50%;
+  top: calc(50% - 0.25rem);
   transform: translateY(-50%);
   opacity: 0.4;
   transition: all 0.2s ease;
@@ -206,6 +207,7 @@ article {
 .article-content h2 .heading-anchor:hover {
   opacity: 1;
   background: #FDF4CD;
+  border-bottom: none;
 }
 
 .article-content h2 .heading-anchor svg {

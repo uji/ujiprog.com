@@ -2,6 +2,7 @@ package markdown
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -9,6 +10,7 @@ import (
 
 	"github.com/yuin/goldmark"
 	meta "github.com/yuin/goldmark-meta"
+	"github.com/yuin/goldmark/ast"
 	"github.com/yuin/goldmark/extension"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/renderer/html"
@@ -40,6 +42,35 @@ type ParsedArticle struct {
 type Parser struct {
 	md       goldmark.Markdown
 	expander *Expander
+}
+
+// japaneseIDs implements parser.IDs interface
+// It uses heading text as-is for IDs, supporting Japanese characters
+type japaneseIDs struct {
+	values map[string]int
+}
+
+// newJapaneseIDs creates a new japaneseIDs instance
+func newJapaneseIDs() *japaneseIDs {
+	return &japaneseIDs{
+		values: make(map[string]int),
+	}
+}
+
+// Generate generates an ID from heading text
+func (ids *japaneseIDs) Generate(value []byte, kind ast.NodeKind) []byte {
+	text := string(value)
+	if count, ok := ids.values[text]; ok {
+		ids.values[text] = count + 1
+		return []byte(fmt.Sprintf("%s-%d", text, count+1))
+	}
+	ids.values[text] = 1
+	return value
+}
+
+// Put registers an ID that was manually set
+func (ids *japaneseIDs) Put(value []byte) {
+	ids.values[string(value)] = 1
 }
 
 // NewParser creates a new markdown parser with goldmark configuration
@@ -77,7 +108,7 @@ func (p *Parser) ParseFile(path string) (*ParsedArticle, error) {
 // Parse parses markdown content and returns a ParsedArticle
 func (p *Parser) Parse(source []byte, filename string) (*ParsedArticle, error) {
 	var buf bytes.Buffer
-	context := parser.NewContext()
+	context := parser.NewContext(parser.WithIDs(newJapaneseIDs()))
 
 	if err := p.md.Convert(source, &buf, parser.WithContext(context)); err != nil {
 		return nil, err
