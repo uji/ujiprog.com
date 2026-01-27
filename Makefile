@@ -50,8 +50,8 @@ generate-articles:
 		-output=.generated/articles \
 		-template=templates/article.html \
 		-og-template=templates/blog-ogp-tmpl.png \
-		-ascii-font=fonts/DMSans-Bold.ttf \
-		-japanese-font=fonts/NotoSansJP-Bold.ttf \
+		-ascii-font=fonts/DMSans/DMSans-Bold.ttf \
+		-japanese-font=fonts/NotoSansJP/NotoSansJP-Bold.ttf \
 		-font-size=56 \
 		-articles-json=public/articles.json
 	@echo "Article generation complete"

@@ -3,8 +3,7 @@ build
 tmp
 node_modules
 .wrangler
-fonts/*
-!fonts/.gitkeep
+.DS_Store
 
 .dev.vars*
 !.dev.vars.example
