@@ -1,6 +1,12 @@
 {
   "articles": [
     {
+      "title": "令和8年 VSCode から Vim(Neovim) に戻った",
+      "url": "/articles/return-vim",
+      "published_at": "2026-01-31T00:00:00Z",
+      "platform": "blog"
+    },
+    {
       "title": "自分のブログを syumai/workers(Go) で作った",
       "url": "/articles/created-my-own-blog",
       "published_at": "2026-01-24T00:00:00Z",
