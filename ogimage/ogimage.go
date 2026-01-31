@@ -1,11 +1,12 @@
-package markdown
+package ogimage
 
 import (
+	"bytes"
 	"image"
 	"image/color"
 	"image/draw"
 	"image/png"
-	"os"
+	"io"
 	"strings"
 
 	"golang.org/x/image/font"
@@ -14,53 +15,49 @@ import (
 	"golang.org/x/image/math/fixed"
 )
 
-// FontConfig holds font configuration for OG image generation
-type FontConfig struct {
-	ASCIIFontPath    string
-	JapaneseFontPath string
-	FontSize         float64
-}
-
-// OGImageGenerator generates OG images for articles
-type OGImageGenerator struct {
-	templatePath string
-	fontConfig   FontConfig
+// Generator generates OG images for articles (WASM compatible)
+type Generator struct {
+	templateImg  image.Image
 	asciiFace    font.Face
 	japaneseFace font.Face
+	fontSize     float64
 }
 
-// NewOGImageGenerator creates a new OG image generator with multiple fonts
-func NewOGImageGenerator(templatePath string, fontConfig FontConfig) *OGImageGenerator {
-	gen := &OGImageGenerator{
-		templatePath: templatePath,
-		fontConfig:   fontConfig,
+// NewGenerator creates a new OG image generator from byte slices
+func NewGenerator(templateData, asciiFontData, japaneseFontData []byte, fontSize float64) (*Generator, error) {
+	// Decode template image
+	templateImg, err := png.Decode(bytes.NewReader(templateData))
+	if err != nil {
+		return nil, err
+	}
+
+	gen := &Generator{
+		templateImg: templateImg,
+		fontSize:    fontSize,
 	}
 
 	// Load ASCII font
-	if fontConfig.ASCIIFontPath != "" {
-		if face, err := loadFontFace(fontConfig.ASCIIFontPath, fontConfig.FontSize); err == nil {
+	if len(asciiFontData) > 0 {
+		face, err := loadFontFace(asciiFontData, fontSize)
+		if err == nil {
 			gen.asciiFace = face
 		}
 	}
 
 	// Load Japanese font
-	if fontConfig.JapaneseFontPath != "" {
-		if face, err := loadFontFace(fontConfig.JapaneseFontPath, fontConfig.FontSize); err == nil {
+	if len(japaneseFontData) > 0 {
+		face, err := loadFontFace(japaneseFontData, fontSize)
+		if err == nil {
 			gen.japaneseFace = face
 		}
 	}
 
-	return gen
+	return gen, nil
 }
 
-// loadFontFace loads a font file and returns a font.Face
-func loadFontFace(path string, size float64) (font.Face, error) {
-	fontBytes, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-
-	f, err := sfnt.Parse(fontBytes)
+// loadFontFace loads a font from byte slice and returns a font.Face
+func loadFontFace(data []byte, size float64) (font.Face, error) {
+	f, err := sfnt.Parse(data)
 	if err != nil {
 		return nil, err
 	}
@@ -125,8 +122,7 @@ func segmentText(text string) []textSegment {
 }
 
 // drawTextDirect draws text directly using font.Drawer for accurate glyph coverage
-// This method uses FreeType's coverage bitmap directly, avoiding quantization errors
-func (g *OGImageGenerator) drawTextDirect(dst draw.Image, line string, centerX, y float64, textColor color.Color) {
+func (g *Generator) drawTextDirect(dst draw.Image, line string, centerX, y float64, textColor color.Color) {
 	segments := segmentText(line)
 	totalWidth := g.measureLineWidth(line)
 
@@ -165,21 +161,15 @@ func (g *OGImageGenerator) drawTextDirect(dst draw.Image, line string, centerX, 
 	}
 }
 
-// Generate creates an OG image with the given title and saves it to outputPath
-func (g *OGImageGenerator) Generate(title, outputPath string) error {
-	// Load template image
-	templateImg, err := loadPNG(g.templatePath)
-	if err != nil {
-		return err
-	}
-
-	bounds := templateImg.Bounds()
+// Generate creates an OG image with the given title and writes it to the writer
+func (g *Generator) Generate(title string, w io.Writer) error {
+	bounds := g.templateImg.Bounds()
 	width := bounds.Dx()
 	height := bounds.Dy()
 
 	// Create RGBA image and draw template as background
 	dst := image.NewRGBA(bounds)
-	draw.Draw(dst, bounds, templateImg, bounds.Min, draw.Src)
+	draw.Draw(dst, bounds, g.templateImg, bounds.Min, draw.Src)
 
 	// Text color (dark gray to match site design)
 	textColor := color.RGBA{R: 74, G: 75, B: 74, A: 255}
@@ -200,7 +190,7 @@ func (g *OGImageGenerator) Generate(title, outputPath string) error {
 	}
 
 	// Calculate total height of text block
-	lineHeight := g.fontConfig.FontSize * 1.5
+	lineHeight := g.fontSize * 1.5
 	totalTextHeight := float64(len(allLines)) * lineHeight
 
 	// Draw each line centered using direct font.Drawer (accurate glyph coverage)
@@ -210,12 +200,12 @@ func (g *OGImageGenerator) Generate(title, outputPath string) error {
 		g.drawTextDirect(dst, line, textAreaX, y, textColor)
 	}
 
-	// Save to file
-	return savePNG(outputPath, dst)
+	// Encode to PNG
+	return png.Encode(w, dst)
 }
 
 // wrapTextMultiFont wraps text considering multiple fonts
-func (g *OGImageGenerator) wrapTextMultiFont(text string, maxWidth float64) []string {
+func (g *Generator) wrapTextMultiFont(text string, maxWidth float64) []string {
 	var lines []string
 
 	// Measure and wrap character by character for accuracy with mixed fonts
@@ -247,7 +237,7 @@ func (g *OGImageGenerator) wrapTextMultiFont(text string, maxWidth float64) []st
 }
 
 // measureLineWidth measures the width of a line considering multiple fonts
-func (g *OGImageGenerator) measureLineWidth(line string) float64 {
+func (g *Generator) measureLineWidth(line string) float64 {
 	segments := segmentText(line)
 	var totalWidth fixed.Int26_6
 
@@ -265,26 +255,4 @@ func (g *OGImageGenerator) measureLineWidth(line string) float64 {
 	}
 
 	return float64(totalWidth) / 64.0 // Convert from fixed.Int26_6 to float64
-}
-
-// loadPNG loads a PNG image from file
-func loadPNG(path string) (image.Image, error) {
-	f, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-
-	return png.Decode(f)
-}
-
-// savePNG saves an image to a PNG file
-func savePNG(path string, img image.Image) error {
-	f, err := os.Create(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	return png.Encode(f, img)
 }

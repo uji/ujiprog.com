@@ -3,7 +3,6 @@ module github.com/uji/ujiprog.com
 go 1.25.5
 
 require (
-	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0
 	github.com/syumai/workers v0.31.0
 	github.com/yuin/goldmark v1.7.16
 	github.com/yuin/goldmark-meta v1.1.0

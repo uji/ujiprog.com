@@ -24,15 +24,20 @@ type Article struct {
 	Platform    string `json:"platform"`
 }
 
+// OGMeta represents OG image metadata for an article
+type OGMeta struct {
+	Title string `json:"title"` // OG画像用タイトル（改行含む）
+}
+
+// OGMetaData maps article slug to OG metadata
+type OGMetaData map[string]OGMeta
+
 func main() {
 	articlesDir := flag.String("articles", "articles", "Directory containing markdown articles")
 	outputDir := flag.String("output", "build/articles", "Directory to output generated HTML and images")
 	templatePath := flag.String("template", "templates/article.html", "Path to article HTML template")
-	ogTemplatePath := flag.String("og-template", "templates/blog-ogp-tmpl.png", "Path to OG image template")
-	asciiFontPath := flag.String("ascii-font", "", "Path to ASCII font file for OG image generation")
-	japaneseFontPath := flag.String("japanese-font", "", "Path to Japanese font file for OG image generation")
-	fontSize := flag.Float64("font-size", 48, "Font size for OG image text")
 	articlesJSONPath := flag.String("articles-json", "public/articles.json", "Path to articles.json for merging")
+	ogMetaPath := flag.String("og-meta", "", "Path to output og-meta.json (optional)")
 	flag.Parse()
 
 	// Ensure output directory exists
@@ -58,19 +63,9 @@ func main() {
 		log.Fatalf("Failed to create renderer: %v", err)
 	}
 
-	// Create OG image generator if fonts are provided
-	var ogGenerator *markdown.OGImageGenerator
-	if *asciiFontPath != "" && *japaneseFontPath != "" {
-		fontConfig := markdown.FontConfig{
-			ASCIIFontPath:    *asciiFontPath,
-			JapaneseFontPath: *japaneseFontPath,
-			FontSize:         *fontSize,
-		}
-		ogGenerator = markdown.NewOGImageGenerator(*ogTemplatePath, fontConfig)
-	}
-
 	// Process each markdown file
 	var localArticles []Article
+	ogMetaData := make(OGMetaData)
 	for _, mdFile := range mdFiles {
 		log.Printf("Processing: %s", mdFile)
 
@@ -88,14 +83,9 @@ func main() {
 		}
 		log.Printf("Generated: %s/%s.html", *outputDir, article.Filename)
 
-		// Generate OG image if generator is available
-		if ogGenerator != nil {
-			ogOutputPath := filepath.Join(*outputDir, article.Filename+".png")
-			if err := ogGenerator.Generate(article.Meta.OGTitle(), ogOutputPath); err != nil {
-				log.Printf("Failed to generate OG image for %s: %v", mdFile, err)
-			} else {
-				log.Printf("Generated: %s", ogOutputPath)
-			}
+		// Collect OG metadata
+		ogMetaData[article.Filename] = OGMeta{
+			Title: article.Meta.OGTitle(),
 		}
 
 		// Add to local articles list
@@ -114,7 +104,30 @@ func main() {
 		log.Printf("Updated: %s", *articlesJSONPath)
 	}
 
+	// Save OG metadata if path is specified
+	if *ogMetaPath != "" {
+		if err := saveOGMeta(*ogMetaPath, ogMetaData); err != nil {
+			log.Printf("Warning: Failed to save og-meta.json: %v", err)
+		} else {
+			log.Printf("Generated: %s", *ogMetaPath)
+		}
+	}
+
 	log.Println("Generation complete!")
+}
+
+// saveOGMeta saves OG metadata to a JSON file
+func saveOGMeta(path string, data OGMetaData) error {
+	jsonBytes, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal OG metadata: %w", err)
+	}
+
+	if err := os.WriteFile(path, jsonBytes, 0644); err != nil {
+		return fmt.Errorf("failed to write og-meta.json: %w", err)
+	}
+
+	return nil
 }
 
 // mergeArticlesJSON merges local articles with existing articles.json

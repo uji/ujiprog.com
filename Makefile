@@ -8,7 +8,7 @@ build:
 	GOOS=js GOARCH=wasm go build -o ./build/app.wasm .
 
 .PHONY: dev
-dev:
+dev: generate-articles
 	npx wrangler r2 object put ujiprog-static/index.html --file=index.html --local
 	npx wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --local
 	npx wrangler r2 object put ujiprog-static/favicon.ico --file=public/favicon.ico --local
@@ -17,12 +17,18 @@ dev:
 	npx wrangler r2 object put ujiprog-static/article.css --file=public/article.css --local
 	npx wrangler r2 object put ujiprog-static/main.js --file=public/main.js --local
 	npx wrangler r2 object put ujiprog-static/article.js --file=public/article.js --local
-	@for f in .generated/articles/*; do \
+	@# Upload article HTML files
+	@for f in .generated/articles/*.html; do \
 		if [ -f "$$f" ]; then \
 			echo "Uploading: $$f"; \
 			npx wrangler r2 object put "ujiprog-static/articles/$$(basename $$f)" --file="$$f" --local; \
 		fi; \
 	done
+	@# Upload OG metadata and assets for dynamic OG image generation
+	npx wrangler r2 object put ujiprog-static/og-meta.json --file=.generated/og-meta.json --local
+	npx wrangler r2 object put ujiprog-static/fonts/DMSans-Bold.ttf --file=fonts/DMSans/DMSans-Bold.ttf --local
+	npx wrangler r2 object put ujiprog-static/fonts/NotoSansJP-Bold.ttf --file=fonts/NotoSansJP/NotoSansJP-Bold.ttf --local
+	npx wrangler r2 object put ujiprog-static/templates/blog-ogp-tmpl.png --file=templates/blog-ogp-tmpl.png --local
 	npx wrangler dev
 
 .PHONY: fetch-articles
@@ -49,11 +55,8 @@ generate-articles:
 		-articles=articles \
 		-output=.generated/articles \
 		-template=templates/article.html \
-		-og-template=templates/blog-ogp-tmpl.png \
-		-ascii-font=fonts/DMSans/DMSans-Bold.ttf \
-		-japanese-font=fonts/NotoSansJP/NotoSansJP-Bold.ttf \
-		-font-size=56 \
-		-articles-json=public/articles.json
+		-articles-json=public/articles.json \
+		-og-meta=.generated/og-meta.json
 	@echo "Article generation complete"
 
 .PHONY: deploy
@@ -65,12 +68,18 @@ deploy: generate-articles
 	npx wrangler r2 object put ujiprog-static/article.css --file=public/article.css --remote
 	npx wrangler r2 object put ujiprog-static/main.js --file=public/main.js --remote
 	npx wrangler r2 object put ujiprog-static/article.js --file=public/article.js --remote
-	@for file in .generated/articles/*.html .generated/articles/*.png; do \
+	@# Upload article HTML files (OG images are generated dynamically)
+	@for file in .generated/articles/*.html; do \
 		if [ -f "$$file" ]; then \
 			filename=$$(basename "$$file"); \
 			echo "Uploading articles/$$filename..."; \
 			npx wrangler r2 object put "ujiprog-static/articles/$$filename" --file="$$file" --remote; \
 		fi \
 	done
+	@# Upload OG metadata and assets for dynamic OG image generation
+	npx wrangler r2 object put ujiprog-static/og-meta.json --file=.generated/og-meta.json --remote
+	npx wrangler r2 object put ujiprog-static/fonts/DMSans-Bold.ttf --file=fonts/DMSans/DMSans-Bold.ttf --remote
+	npx wrangler r2 object put ujiprog-static/fonts/NotoSansJP-Bold.ttf --file=fonts/NotoSansJP/NotoSansJP-Bold.ttf --remote
+	npx wrangler r2 object put ujiprog-static/templates/blog-ogp-tmpl.png --file=templates/blog-ogp-tmpl.png --remote
 	$(MAKE) build
 	npx wrangler deploy
