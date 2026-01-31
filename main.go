@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"strings"
 
 	"github.com/syumai/workers"
 	"github.com/syumai/workers/cloudflare/r2"
+	"github.com/uji/ujiprog.com/ogimage"
 )
 
 func main() {
@@ -152,6 +155,14 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 	workers.Serve(nil) // use http.DefaultServeMux
 }
 
+// OGMeta represents OG image metadata for an article
+type OGMeta struct {
+	Title string `json:"title"`
+}
+
+// OGMetaData maps article slug to OG metadata
+type OGMetaData map[string]OGMeta
+
 func articlesHandler(w http.ResponseWriter, req *http.Request) {
 	bucket, err := r2.NewBucket("STATIC_BUCKET")
 	if err != nil {
@@ -166,21 +177,18 @@ func articlesHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	// Determine content type and R2 key
-	var contentType string
-	var r2Key string
-
+	// Handle OG image requests dynamically
 	if strings.HasSuffix(path, ".png") {
-		contentType = "image/png"
-		r2Key = "articles/" + path
+		handleOGImage(w, req, bucket, path)
+		return
+	}
+
+	// Default to HTML - add .html extension if not present
+	var r2Key string
+	if !strings.HasSuffix(path, ".html") {
+		r2Key = "articles/" + path + ".html"
 	} else {
-		// Default to HTML - add .html extension if not present
-		contentType = "text/html; charset=utf-8"
-		if !strings.HasSuffix(path, ".html") {
-			r2Key = "articles/" + path + ".html"
-		} else {
-			r2Key = "articles/" + path
-		}
+		r2Key = "articles/" + path
 	}
 
 	obj, err := bucket.Get(r2Key)
@@ -189,15 +197,98 @@ func articlesHandler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	w.Header().Set("Content-Type", contentType)
-	if contentType == "text/html; charset=utf-8" {
-		w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data: blob:; script-src 'self' https://platform.twitter.com; frame-src https://platform.twitter.com https://syndication.twitter.com;")
-		w.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
-		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("X-Frame-Options", "DENY")
-		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
-	}
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+	w.Header().Set("Content-Security-Policy", "default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' https: data: blob:; script-src 'self' https://platform.twitter.com; frame-src https://platform.twitter.com https://syndication.twitter.com;")
+	w.Header().Set("Cross-Origin-Opener-Policy", "same-origin")
+	w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
+	w.Header().Set("X-Content-Type-Options", "nosniff")
+	w.Header().Set("X-Frame-Options", "DENY")
+	w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
 
 	io.Copy(w, obj.Body)
+}
+
+// handleOGImage generates OG images dynamically
+func handleOGImage(w http.ResponseWriter, req *http.Request, bucket *r2.Bucket, path string) {
+	// Extract article slug from path (e.g., "my-article.png" -> "my-article")
+	slug := strings.TrimSuffix(path, ".png")
+
+	// Load OG metadata
+	ogMetaObj, err := bucket.Get("og-meta.json")
+	if err != nil || ogMetaObj == nil {
+		http.Error(w, "OG metadata not found", http.StatusInternalServerError)
+		return
+	}
+	ogMetaData, err := io.ReadAll(ogMetaObj.Body)
+	if err != nil {
+		http.Error(w, "Failed to read OG metadata", http.StatusInternalServerError)
+		return
+	}
+
+	var ogMeta OGMetaData
+	if err := json.Unmarshal(ogMetaData, &ogMeta); err != nil {
+		http.Error(w, "Failed to parse OG metadata", http.StatusInternalServerError)
+		return
+	}
+
+	// Find the title for this article
+	meta, ok := ogMeta[slug]
+	if !ok {
+		http.NotFound(w, req)
+		return
+	}
+
+	// Load template image
+	templateObj, err := bucket.Get("templates/blog-ogp-tmpl.png")
+	if err != nil || templateObj == nil {
+		http.Error(w, "Template not found", http.StatusInternalServerError)
+		return
+	}
+	templateData, err := io.ReadAll(templateObj.Body)
+	if err != nil {
+		http.Error(w, "Failed to read template", http.StatusInternalServerError)
+		return
+	}
+
+	// Load fonts
+	asciiFontObj, err := bucket.Get("fonts/DMSans-Bold.ttf")
+	if err != nil || asciiFontObj == nil {
+		http.Error(w, "ASCII font not found", http.StatusInternalServerError)
+		return
+	}
+	asciiFontData, err := io.ReadAll(asciiFontObj.Body)
+	if err != nil {
+		http.Error(w, "Failed to read ASCII font", http.StatusInternalServerError)
+		return
+	}
+
+	japaneseFontObj, err := bucket.Get("fonts/NotoSansJP-Bold.ttf")
+	if err != nil || japaneseFontObj == nil {
+		http.Error(w, "Japanese font not found", http.StatusInternalServerError)
+		return
+	}
+	japaneseFontData, err := io.ReadAll(japaneseFontObj.Body)
+	if err != nil {
+		http.Error(w, "Failed to read Japanese font", http.StatusInternalServerError)
+		return
+	}
+
+	// Create OG image generator
+	generator, err := ogimage.NewGenerator(templateData, asciiFontData, japaneseFontData, 56)
+	if err != nil {
+		http.Error(w, "Failed to create OG generator: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Generate OG image
+	var buf bytes.Buffer
+	if err := generator.Generate(meta.Title, &buf); err != nil {
+		http.Error(w, "Failed to generate OG image: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Set response headers
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+	w.Write(buf.Bytes())
 }

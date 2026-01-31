@@ -24,6 +24,14 @@ type Article struct {
 	Platform    string `json:"platform"`
 }
 
+// OGMeta represents OG image metadata for an article
+type OGMeta struct {
+	Title string `json:"title"` // OG画像用タイトル（改行含む）
+}
+
+// OGMetaData maps article slug to OG metadata
+type OGMetaData map[string]OGMeta
+
 func main() {
 	articlesDir := flag.String("articles", "articles", "Directory containing markdown articles")
 	outputDir := flag.String("output", "build/articles", "Directory to output generated HTML and images")
@@ -33,6 +41,7 @@ func main() {
 	japaneseFontPath := flag.String("japanese-font", "", "Path to Japanese font file for OG image generation")
 	fontSize := flag.Float64("font-size", 48, "Font size for OG image text")
 	articlesJSONPath := flag.String("articles-json", "public/articles.json", "Path to articles.json for merging")
+	ogMetaPath := flag.String("og-meta", "", "Path to output og-meta.json (optional)")
 	flag.Parse()
 
 	// Ensure output directory exists
@@ -71,6 +80,7 @@ func main() {
 
 	// Process each markdown file
 	var localArticles []Article
+	ogMetaData := make(OGMetaData)
 	for _, mdFile := range mdFiles {
 		log.Printf("Processing: %s", mdFile)
 
@@ -98,6 +108,11 @@ func main() {
 			}
 		}
 
+		// Collect OG metadata
+		ogMetaData[article.Filename] = OGMeta{
+			Title: article.Meta.OGTitle(),
+		}
+
 		// Add to local articles list
 		localArticles = append(localArticles, Article{
 			Title:       article.Meta.Title,
@@ -114,7 +129,30 @@ func main() {
 		log.Printf("Updated: %s", *articlesJSONPath)
 	}
 
+	// Save OG metadata if path is specified
+	if *ogMetaPath != "" {
+		if err := saveOGMeta(*ogMetaPath, ogMetaData); err != nil {
+			log.Printf("Warning: Failed to save og-meta.json: %v", err)
+		} else {
+			log.Printf("Generated: %s", *ogMetaPath)
+		}
+	}
+
 	log.Println("Generation complete!")
+}
+
+// saveOGMeta saves OG metadata to a JSON file
+func saveOGMeta(path string, data OGMetaData) error {
+	jsonBytes, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return fmt.Errorf("failed to marshal OG metadata: %w", err)
+	}
+
+	if err := os.WriteFile(path, jsonBytes, 0644); err != nil {
+		return fmt.Errorf("failed to write og-meta.json: %w", err)
+	}
+
+	return nil
 }
 
 // mergeArticlesJSON merges local articles with existing articles.json
