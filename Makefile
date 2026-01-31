@@ -55,10 +55,6 @@ generate-articles:
 		-articles=articles \
 		-output=.generated/articles \
 		-template=templates/article.html \
-		-og-template=templates/blog-ogp-tmpl.png \
-		-ascii-font=fonts/DMSans/DMSans-Bold.ttf \
-		-japanese-font=fonts/NotoSansJP/NotoSansJP-Bold.ttf \
-		-font-size=56 \
 		-articles-json=public/articles.json \
 		-og-meta=.generated/og-meta.json
 	@echo "Article generation complete"

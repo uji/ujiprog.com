@@ -85,6 +85,7 @@ make deploy              # R2 アップロード + Workers デプロイ
 
 #### 品質チェック
 ```bash
+make build         # ビルドエラーの確認（wasmビルド、go build ./... は使わない）
 go test ./...      # テスト実行
 go fmt ./...       # フォーマット
 /verify-browser    # ブラウザで描画確認
