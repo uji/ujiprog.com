@@ -38,6 +38,7 @@ func main() {
 	templatePath := flag.String("template", "templates/article.html", "Path to article HTML template")
 	articlesJSONPath := flag.String("articles-json", "public/articles.json", "Path to articles.json for merging")
 	ogMetaPath := flag.String("og-meta", "", "Path to output og-meta.json (optional)")
+	singleFile := flag.String("single", "", "Process a single markdown file instead of all files")
 	flag.Parse()
 
 	// Ensure output directory exists
@@ -45,10 +46,21 @@ func main() {
 		log.Fatalf("Failed to create output directory: %v", err)
 	}
 
-	// Find all markdown files
-	mdFiles, err := filepath.Glob(filepath.Join(*articlesDir, "*.md"))
-	if err != nil {
-		log.Fatalf("Failed to find markdown files: %v", err)
+	var mdFiles []string
+
+	// If single file mode, process only that file
+	if *singleFile != "" {
+		if _, err := os.Stat(*singleFile); os.IsNotExist(err) {
+			log.Fatalf("Single file does not exist: %s", *singleFile)
+		}
+		mdFiles = []string{*singleFile}
+	} else {
+		// Find all markdown files
+		var err error
+		mdFiles, err = filepath.Glob(filepath.Join(*articlesDir, "*.md"))
+		if err != nil {
+			log.Fatalf("Failed to find markdown files: %v", err)
+		}
 	}
 
 	if len(mdFiles) == 0 {

@@ -22,7 +22,8 @@ make deploy             # R2 にアセットをアップロードし、Cloudflar
 
 ### ローカル開発 (Wrangler)
 ```bash
-make dev                # ローカル R2 にアセットを配置して wrangler dev を起動
+make dev-init           # 初回セットアップ（全アセットをローカルR2にアップロード）
+make dev                # wrangler dev を起動（高速）
 ```
 
 ## コードスタイルガイドライン
@@ -60,8 +61,10 @@ make dev                # ローカル R2 にアセットを配置して wrangle
 
 #### ローカル開発
 ```bash
-make run           # Air によるホットリロード開発
-                   # Go/HTML/Markdown の変更 → 記事生成 → ビルド → サーバー再起動
+make dev-init      # 初回セットアップ（全アセットをローカルR2にアップロード）
+make run           # Air によるホットリロード開発（並列監視）
+                   # - Go/HTML/CSS/JS 変更 → ビルド → wrangler dev 再起動
+                   # - Markdown 変更 → 差分ファイルのみ処理 → R2 アップロード
 ```
 
 #### 外部記事の取得（Zenn/note/SpeakerDeck）
@@ -79,7 +82,10 @@ make deploy              # R2 アップロード + Workers デプロイ
 #### コマンド早見表
 | コマンド | 用途 |
 |----------|------|
-| `make run` | ホットリロード開発（Go/HTML/Markdown 全対応） |
+| `make dev-init` | 初回セットアップ（全アセットアップロード） |
+| `make run` | ホットリロード開発（Go/HTML + Markdown 並列監視） |
+| `make dev` | wrangler dev のみ起動 |
+| `make dev-sync-articles` | Git差分のMarkdownのみ処理・アップロード |
 | `make fetch-articles` | 外部記事一覧を更新 |
 | `make deploy` | 本番環境へデプロイ |
 

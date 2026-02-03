@@ -1,14 +1,16 @@
 .PHONY: run
 run:
-	go tool air
+	@# 両方のAir監視を並列起動
+	go tool air -c .air.toml & go tool air -c .air-articles.toml & wait
 
 .PHONY: build
 build:
 	go run github.com/syumai/workers/cmd/workers-assets-gen -mode=go
 	GOOS=js GOARCH=wasm go build -o ./build/app.wasm .
 
-.PHONY: dev
-dev: generate-articles
+# 初回セットアップ（全アセットアップロード）
+.PHONY: dev-init
+dev-init: generate-articles
 	npx wrangler r2 object put ujiprog-static/index.html --file=index.html --local
 	npx wrangler r2 object put ujiprog-static/avator.jpg --file=public/avator.jpg --local
 	npx wrangler r2 object put ujiprog-static/favicon.ico --file=public/favicon.ico --local
@@ -29,7 +31,33 @@ dev: generate-articles
 	npx wrangler r2 object put ujiprog-static/fonts/DMSans-Bold.ttf --file=fonts/DMSans/DMSans-Bold.ttf --local
 	npx wrangler r2 object put ujiprog-static/fonts/NotoSansJP-Bold.ttf --file=fonts/NotoSansJP/NotoSansJP-Bold.ttf --local
 	npx wrangler r2 object put ujiprog-static/templates/blog-ogp-tmpl.png --file=templates/blog-ogp-tmpl.png --local
+
+# 開発サーバー起動のみ（高速）
+.PHONY: dev
+dev:
 	npx wrangler dev
+
+# Git差分のMarkdownのみ処理
+.PHONY: dev-sync-articles
+dev-sync-articles:
+	@changed=$$(git diff --name-only articles/ 2>/dev/null); \
+	untracked=$$(git ls-files --others --exclude-standard articles/ 2>/dev/null); \
+	all_changed="$$changed $$untracked"; \
+	for md in $$all_changed; do \
+		if [ -f "$$md" ] && [ "$${md##*.}" = "md" ]; then \
+			slug=$$(basename "$$md" .md); \
+			echo "Processing: $$md"; \
+			go run ./cmd/generate \
+				-single="$$md" \
+				-output=.generated/articles \
+				-template=templates/article.html \
+				-articles-json=public/articles.json \
+				-og-meta=.generated/og-meta.json; \
+			npx wrangler r2 object put "ujiprog-static/articles/$$slug.html" \
+				--file=".generated/articles/$$slug.html" --local; \
+		fi; \
+	done; \
+	npx wrangler r2 object put ujiprog-static/og-meta.json --file=.generated/og-meta.json --local
 
 .PHONY: fetch-articles
 fetch-articles:
