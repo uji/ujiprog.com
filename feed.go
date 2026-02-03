@@ -7,8 +7,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	"github.com/syumai/workers/cloudflare/r2"
 )
 
 type ArticlesData struct {
@@ -59,12 +57,6 @@ type GUID struct {
 }
 
 func feedHandler(w http.ResponseWriter, req *http.Request) {
-	bucket, err := r2.NewBucket("STATIC_BUCKET")
-	if err != nil {
-		http.Error(w, "bucket error: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
 	obj, err := bucket.Get("articles.json")
 	if err != nil {
 		http.Error(w, "get error: "+err.Error(), http.StatusInternalServerError)

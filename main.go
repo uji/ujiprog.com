@@ -12,6 +12,16 @@ import (
 	"github.com/uji/ujiprog.com/ogimage"
 )
 
+var bucket *r2.Bucket
+
+func init() {
+	var err error
+	bucket, err = r2.NewBucket("STATIC_BUCKET")
+	if err != nil {
+		panic(err)
+	}
+}
+
 func main() {
 	http.HandleFunc("/robots.txt", func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
@@ -42,12 +52,6 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 </urlset>`))
 	})
 	http.HandleFunc("/articles.json", func(w http.ResponseWriter, req *http.Request) {
-		bucket, err := r2.NewBucket("STATIC_BUCKET")
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
 		obj, err := bucket.Get("articles.json")
 		if err != nil || obj == nil {
 			http.NotFound(w, req)
@@ -58,12 +62,6 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/style.css", func(w http.ResponseWriter, req *http.Request) {
-		bucket, err := r2.NewBucket("STATIC_BUCKET")
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
 		obj, err := bucket.Get("style.css")
 		if err != nil || obj == nil {
 			http.NotFound(w, req)
@@ -74,12 +72,6 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/article.css", func(w http.ResponseWriter, req *http.Request) {
-		bucket, err := r2.NewBucket("STATIC_BUCKET")
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
 		obj, err := bucket.Get("article.css")
 		if err != nil || obj == nil {
 			http.NotFound(w, req)
@@ -90,12 +82,6 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/main.js", func(w http.ResponseWriter, req *http.Request) {
-		bucket, err := r2.NewBucket("STATIC_BUCKET")
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
 		obj, err := bucket.Get("main.js")
 		if err != nil || obj == nil {
 			http.NotFound(w, req)
@@ -106,12 +92,6 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/article.js", func(w http.ResponseWriter, req *http.Request) {
-		bucket, err := r2.NewBucket("STATIC_BUCKET")
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
-		}
-
 		obj, err := bucket.Get("article.js")
 		if err != nil || obj == nil {
 			http.NotFound(w, req)
@@ -127,12 +107,6 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		// Redirect unknown paths to root
 		if req.URL.Path != "/" {
 			http.Redirect(w, req, "/", http.StatusFound)
-			return
-		}
-
-		bucket, err := r2.NewBucket("STATIC_BUCKET")
-		if err != nil {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 			return
 		}
 
@@ -164,12 +138,6 @@ type OGMeta struct {
 type OGMetaData map[string]OGMeta
 
 func articlesHandler(w http.ResponseWriter, req *http.Request) {
-	bucket, err := r2.NewBucket("STATIC_BUCKET")
-	if err != nil {
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
 	// Extract the path after /articles/
 	path := strings.TrimPrefix(req.URL.Path, "/articles/")
 	if path == "" {
