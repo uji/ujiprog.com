@@ -25,6 +25,7 @@ func init() {
 func main() {
 	http.HandleFunc("/robots.txt", func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=86400")
 		w.Write([]byte(`User-agent: *
 Allow: /
 Allow: /articles/
@@ -35,6 +36,7 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 	})
 	http.HandleFunc("/sitemap.xml", func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Content-Type", "application/xml; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=86400")
 		w.Write([]byte(`<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -59,6 +61,7 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		}
 
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=3600")
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/style.css", func(w http.ResponseWriter, req *http.Request) {
@@ -69,6 +72,7 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		}
 
 		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=604800")
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/article.css", func(w http.ResponseWriter, req *http.Request) {
@@ -79,6 +83,7 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		}
 
 		w.Header().Set("Content-Type", "text/css; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=604800")
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/main.js", func(w http.ResponseWriter, req *http.Request) {
@@ -89,6 +94,7 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		}
 
 		w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=604800")
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/article.js", func(w http.ResponseWriter, req *http.Request) {
@@ -99,6 +105,7 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		}
 
 		w.Header().Set("Content-Type", "application/javascript; charset=utf-8")
+		w.Header().Set("Cache-Control", "public, max-age=604800")
 		io.Copy(w, obj.Body)
 	})
 	http.HandleFunc("/feed.xml", feedHandler)
@@ -123,6 +130,7 @@ Sitemap: https://ujiprog.com/sitemap.xml`))
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+		w.Header().Set("Cache-Control", "public, max-age=300")
 
 		io.Copy(w, obj.Body)
 	})
@@ -172,6 +180,7 @@ func articlesHandler(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("X-Content-Type-Options", "nosniff")
 	w.Header().Set("X-Frame-Options", "DENY")
 	w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
+	w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
 
 	io.Copy(w, obj.Body)
 }

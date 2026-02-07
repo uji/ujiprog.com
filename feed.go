@@ -121,6 +121,7 @@ func feedHandler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/rss+xml; charset=utf-8")
+	w.Header().Set("Cache-Control", "public, max-age=3600")
 	w.Write([]byte(xml.Header))
 	xml.NewEncoder(w).Encode(rss)
 }
