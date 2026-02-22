@@ -1,6 +1,12 @@
 {
   "articles": [
     {
+      "title": "Go Conference mini 2026 in Sendai 参加レポート",
+      "url": "/articles/go-conference-mini-2026",
+      "published_at": "2026-02-23T00:00:00Z",
+      "platform": "blog"
+    },
+    {
       "title": "令和8年 VSCode から Vim(Neovim) に戻った",
       "url": "/articles/return-vim",
       "published_at": "2026-01-31T00:00:00Z",
