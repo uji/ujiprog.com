@@ -1,6 +1,12 @@
 {
   "articles": [
     {
+      "title": "Claude Code Routines で Issue の自動対応をチームで回している話",
+      "url": "https://zenn.dev/uji/articles/claude-routine-auto-fix-issue",
+      "published_at": "2026-05-12T11:30:05.081+09:00",
+      "platform": "zenn"
+    },
+    {
       "title": "Go Conference mini 2026 in Sendai 参加レポート",
       "url": "/articles/go-conference-mini-2026",
       "published_at": "2026-02-23T00:00:00Z",
