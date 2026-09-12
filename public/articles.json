@@ -1,6 +1,12 @@
 {
   "articles": [
     {
+      "title": "東京への引っ越しと、運営参加してるGoコミュニティについて",
+      "url": "/articles/move-to-tokyo",
+      "published_at": "2026-09-12T00:00:00Z",
+      "platform": "blog"
+    },
+    {
       "title": "Claude Code Routines で Issue の自動対応をチームで回している話",
       "url": "https://zenn.dev/uji/articles/claude-routine-auto-fix-issue",
       "published_at": "2026-05-12T11:30:05.081+09:00",
