@@ -1,6 +1,12 @@
 {
   "articles": [
     {
+      "title": "Go 1.27.3 に学ぶ、1件の CVE が Go エコシステムに届くまで",
+      "url": "/articles/how-a-cve-reaches-go-ecosystem",
+      "published_at": "2026-11-01T00:00:00Z",
+      "platform": "blog"
+    },
+    {
       "title": "東京への引っ越しと、運営参加してるGoコミュニティについて",
       "url": "/articles/move-to-tokyo",
       "published_at": "2026-09-12T00:00:00Z",
