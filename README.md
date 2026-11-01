@@ -4,8 +4,14 @@
 
 ## Requirements
 
-- Node.js
+- Node.js 26.13.0 (see `.nvmrc`; npm is bundled with Node.js)
 - Go 1.24.0 or later
+
+```bash
+nvm install
+nvm use
+npm ci
+```
 
 ## Commands
 
