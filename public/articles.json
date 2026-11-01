@@ -1,7 +1,7 @@
 {
   "articles": [
     {
-      "title": "Go 1.27.3 に学ぶ、1件の CVE が Go エコシステムに届くまで",
+      "title": "Go 1.27.3 に学ぶ、脆弱性の修正が利用者に届くまで",
       "url": "/articles/how-a-cve-reaches-go-ecosystem",
       "published_at": "2026-11-01T00:00:00Z",
       "platform": "blog"
